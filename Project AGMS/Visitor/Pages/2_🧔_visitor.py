@@ -9,7 +9,6 @@ from streamlit_extras.switch_page_button import switch_page
 import os
 from datetime import datetime  # Updated import statement
 import sys
-
 sys.path.append('C:/Users/HP/Documents/GitHub/agms/AGMS_Modules')
 import View_task
 import View_Artwork
@@ -20,32 +19,50 @@ import view_guide
 import view_logs
 import view_credentials
 
+
 if 'isVisitor' not in st.session_state:
     st.session_state.isVisitor = False
 
 if 'username' not in st.session_state:
     st.session_state.username = ''
 
-username = st.session_state.username
+
+username=st.session_state.username
+
+
+def do_book():
+    Ticket_book.do_ticket_book(username)
+
+
+def view_ticket():
+   View_ticket.do_view_ticket(username) 
+
+def guide_book():
+    Guide_book.do_guide_book(username)
+
+
+def do_logs():
+    view_logs.do_logs(username)
+
 
 if st.session_state.isVisitor:
+    # st.header('Visitor Dashboard')
+
     def do_logout():
         st.markdown("### Logout")
         st.warning('Are you sure, you want to logout?', icon="⚠️")
         if st.button("Yes", key="logout_yes_button"):
-            st.markdown("### Logout successfully")
+            st.markdown("###Logout successfully")
             switch_page('login')
 
         elif st.button("No", key="logout_no_button"):
             st.markdown("### Continue")
 
     styles = {
-        "container": {"margin": "0px !important", "padding": "0!important", "align-items": "stretch",
-                      "background-color": "#03dffc"},
+        "container": {"margin": "0px !important", "padding": "0!important", "align-items": "stretch", "background-color": "#03dffc"},
         "icon": {"color": "black", "font-size": "20px"},
         "nav-link": {"font-size": "20px", "text-align": "left", "margin": "0px", "--hover-color": "#fcd303"},
-        "nav-link-selected": {"background-color": "#fcd303", "font-size": "20px", "font-weight": "normal",
-                              "color": "black", },
+        "nav-link-selected": {"background-color": "#fcd303", "font-size": "20px", "font-weight": "normal", "color": "black", },
     }
 
     menu = {
@@ -68,9 +85,8 @@ if st.session_state.isVisitor:
                 'action': None, 'item_icon': 'easel2', 'submenu': {
                     'title': None,
                     'items': {
-                        'Ticket Booking': {'action': Ticket_book.do_ticket_book, 'item_icon': 'key', 'submenu': None},
-                        'View Booked Tickets': {'action': View_ticket.do_view_ticket, 'item_icon': 'journals',
-                                                'submenu': None},
+                        'Ticket Booking': {'action': do_book, 'item_icon': 'key', 'submenu': None},
+                        'View Booked Tickets': {'action':view_ticket, 'item_icon': 'journals', 'submenu': None},
                     },
                     'menu_icon': None,
                     'default_index': 0,
@@ -83,9 +99,8 @@ if st.session_state.isVisitor:
                 'action': None, 'item_icon': 'easel2', 'submenu': {
                     'title': None,
                     'items': {
-                        'Guide Booking': {'action': Guide_book.do_guide_book, 'item_icon': 'key', 'submenu': None},
-                        'View Guide Details': {'action': view_guide.do_view_guide, 'item_icon': 'journals',
-                                               'submenu': None},
+                        'Guide Booking': {'action': guide_book, 'item_icon': 'key', 'submenu': None},
+                        'View Guide Details': {'action': view_guide.do_view_guide, 'item_icon': 'journals', 'submenu': None},
                     },
                     'menu_icon': None,
                     'default_index': 0,
@@ -97,6 +112,7 @@ if st.session_state.isVisitor:
             'View Gallery': {
                 'action': None, 'item_icon': 'ticket-perforated', 'submenu': {
                     'title': None,
+
                     'items': {
                         'View Artwork': {'action': View_Artwork.do_view_artw, 'item_icon': 'key', 'submenu': None},
                     },
@@ -112,7 +128,7 @@ if st.session_state.isVisitor:
                     'title': None,
                     'items': {
                         'View Reviews': {'action': view_credentials.do_credentials, 'item_icon': 'key', 'submenu': None},
-                        'Share your experience': {'action': view_logs.do_logs, 'item_icon': 'journals', 'submenu': None},
+                        'Share your experience': {'action': do_logs, 'item_icon': 'journals', 'submenu': None},
                     },
                     'menu_icon': None,
                     'default_index': 0,
@@ -134,6 +150,8 @@ if st.session_state.isVisitor:
                     'styles': styles
                 }
             }
+
+
         },
         'menu_icon': 'person-fill-check',
         'default_index': 0,
@@ -178,5 +196,7 @@ if st.session_state.isVisitor:
             menu['items'][menu_selection]['action']()
 
     show_menu(menu)
+
+
 else:
     st.write("Please Login First !!")

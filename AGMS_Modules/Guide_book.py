@@ -7,7 +7,9 @@ from pandas import option_context
 from IPython.display import display
 from streamlit_extras.switch_page_button import switch_page
 import os
-from datetime import datetime  # Updated import statement
+from datetime import datetime
+
+
 
 def do_guide_book(username):
     connection = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms2')
@@ -51,7 +53,7 @@ def do_guide_book(username):
                         else:
                             st.write("No slot available for the given booking date!!")
                         
-                        
+                    
                         query2='''SELECT gt.tour_id,gt.guide_id,g.Name,g.phone_number,gt.tour_date 
                         FROM guided_tour gt JOIN guide g ON gt.Guide_id=g.Guide_id 
                         WHERE booking_user_id=(SELECT user_id from login where username=%s) AND g.Guide_id=%s'''
