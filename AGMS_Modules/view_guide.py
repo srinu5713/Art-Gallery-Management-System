@@ -19,12 +19,12 @@ def do_view_guide():
     cur.execute(query)
     list1=cur.fetchall()
     list2=[i[0] for i in list1]
+    list2.insert(0,0)
     
     s1 = st.selectbox("Enter Guide ID: ", list2)
     s2 = st.text_input("Enter Guide Name: ")
 
     if st.button("Search"):
-
 
         query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
                 WHERE guide_id=%s AND Name LIKE %s 
@@ -45,10 +45,11 @@ def do_view_guide():
                     ORDER BY rating DESC'''
             cur.execute(query, (f"%{s2}%",))
 
-        else:
+        elif s1==0:
             query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
                     ORDER BY rating DESC'''
             cur.execute(query)
+        
 
         list1 = cur.fetchall()
         df1 = pd.DataFrame(
