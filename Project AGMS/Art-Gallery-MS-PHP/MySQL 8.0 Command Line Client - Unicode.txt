@@ -1,0 +1,693 @@
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 2651
+Server version: 8.0.34 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> source "C:/Users/HP/Downloads/AGMS_Table_creation.sql"
+ERROR:
+Failed to open file '"C:\Users\HP\Downloads\AGMS_Table_creation.sql"', error: 22
+mysql> source "C:/Users/HP/Downloads/AGMS_Table_creation.sql
+ERROR:
+Failed to open file '"C:\Users\HP\Downloads\AGMS_Table_creation.sql', error: 22
+mysql> source C:/Users/HP/Downloads/AGMS_Table_creation.sql
+Query OK, 1 row affected (0.01 sec)
+
+Database changed
+Query OK, 0 rows affected (0.02 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| agms               |
+| class              |
+| classc             |
+| employee           |
+| fest_database      |
+| festdb_142         |
+| information_schema |
+| mysql              |
+| new_company        |
+| performance_schema |
+| studentfinance     |
+| sys                |
++--------------------+
+12 rows in set (0.01 sec)
+
+mysql> use agms;
+Database changed
+mysql> show tables;
++----------------+
+| Tables_in_agms |
++----------------+
+| artwork        |
+| artwork_view   |
+| guide          |
+| guided_tour    |
+| review         |
+| ticket         |
+| visitor        |
+| visitor_log    |
+| visitor_tag    |
++----------------+
+9 rows in set (0.00 sec)
+
+mysql> desc artwork;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Artwork_ID     | int          | NO   | PRI | NULL    |       |
+| Title          | varchar(30)  | NO   |     | NULL    |       |
+| Artist         | varchar(30)  | NO   |     | NULL    |       |
+| description    | varchar(100) | YES  |     | NULL    |       |
+| Published_date | date         | NO   |     | NULL    |       |
++----------------+--------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> alter table add column Ranking int ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'add column Ranking int' at line 1
+mysql> alter table artwork add column Ranking int ;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> desc artwork
+    -> ;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Artwork_ID     | int          | NO   | PRI | NULL    |       |
+| Title          | varchar(30)  | NO   |     | NULL    |       |
+| Artist         | varchar(30)  | NO   |     | NULL    |       |
+| description    | varchar(100) | YES  |     | NULL    |       |
+| Published_date | date         | NO   |     | NULL    |       |
+| Ranking        | int          | YES  |     | NULL    |       |
++----------------+--------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> desc visitors;
+ERROR 1146 (42S02): Table 'agms.visitors' doesn't exist
+mysql> desc visitor;
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| Visitor_ID   | int         | NO   | PRI | NULL    |       |
+| Ticket_ID    | int         | NO   | MUL | NULL    |       |
+| Name         | varchar(30) | NO   |     | NULL    |       |
+| Email_ID     | varchar(40) | YES  |     | NULL    |       |
+| Phone_Number | varchar(10) | NO   |     | NULL    |       |
++--------------+-------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> desc visitor_tag;
++---------------+------+------+-----+---------+-------+
+| Field         | Type | Null | Key | Default | Extra |
++---------------+------+------+-----+---------+-------+
+| Tag_ID        | int  | NO   | PRI | NULL    |       |
+| Visitor_ID    | int  | YES  | MUL | NULL    |       |
+| Assigned_Date | date | NO   |     | NULL    |       |
++---------------+------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> -- For the 'artwork' table
+mysql> ALTER TABLE artwork MODIFY Artwork_ID INT AUTO_INCREMENT;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- For the 'visitor' table
+mysql> ALTER TABLE visitor MODIFY Visitor_ID INT AUTO_INCREMENT;
+ERROR 1833 (HY000): Cannot change column 'Visitor_ID': used in a foreign key constraint 'visitor_log_ibfk_1' of table 'agms.visitor_log'
+mysql>
+mysql> -- For the 'visitor_tag' table
+mysql> ALTER TABLE visitor_tag MODIFY Tag_ID INT AUTO_INCREMENT;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc visitor_log;
++------------+-----------+------+-----+---------+-------+
+| Field      | Type      | Null | Key | Default | Extra |
++------------+-----------+------+-----+---------+-------+
+| Log_ID     | int       | NO   | PRI | NULL    |       |
+| Visitor_ID | int       | YES  | MUL | NULL    |       |
+| entry_time | timestamp | NO   |     | NULL    |       |
+| exit_time  | timestamp | NO   |     | NULL    |       |
++------------+-----------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> show create table visitor_log;
++-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table       | Create Table
+
+
+
+                                                         |
++-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| visitor_log | CREATE TABLE `visitor_log` (
+  `Log_ID` int NOT NULL,
+  `Visitor_ID` int DEFAULT NULL,
+  `entry_time` timestamp NOT NULL,
+  `exit_time` timestamp NOT NULL,
+  PRIMARY KEY (`Log_ID`),
+  KEY `Visitor_ID` (`Visitor_ID`),
+  CONSTRAINT `visitor_log_ibfk_1` FOREIGN KEY (`Visitor_ID`) REFERENCES `visitor` (`Visitor_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql>
+
+mysql>
+mysql>
+mysql>
+mysql> alter table visitor_log drop foreign key visitor_log_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE visitor MODIFY Visitor_ID INT AUTO_INCREMENT;
+ERROR 1833 (HY000): Cannot change column 'Visitor_ID': used in a foreign key constraint 'visitor_tag_ibfk_1' of table 'agms.visitor_tag'
+mysql> alter table visitor_log drop foreign key visitor_tag_ibfk_1;
+ERROR 1091 (42000): Can't DROP 'visitor_tag_ibfk_1'; check that column/key exists
+mysql> alter table visitor_tag drop foreign key visitor_tag_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE visitor MODIFY Visitor_ID INT AUTO_INCREMENT;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table visitor_log add foreign key(visitor_id) references visitor(visitor_id);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table visitor_tag add foreign key(visitor_id) references visitor(visitor_id);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql>
+mysql> show tables;\
++----------------+
+| Tables_in_agms |
++----------------+
+| artwork        |
+| artwork_view   |
+| guide          |
+| guided_tour    |
+| review         |
+| ticket         |
+| visitor        |
+| visitor_log    |
+| visitor_tag    |
++----------------+
+9 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql>
+mysql> desc artwork;
++----------------+--------------+------+-----+---------+----------------+
+| Field          | Type         | Null | Key | Default | Extra          |
++----------------+--------------+------+-----+---------+----------------+
+| Artwork_ID     | int          | NO   | PRI | NULL    | auto_increment |
+| Title          | varchar(30)  | NO   |     | NULL    |                |
+| Artist         | varchar(30)  | NO   |     | NULL    |                |
+| description    | varchar(100) | YES  |     | NULL    |                |
+| Published_date | date         | NO   |     | NULL    |                |
+| Ranking        | int          | YES  |     | NULL    |                |
++----------------+--------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> desc artwork_view;
++------------+------+------+-----+---------+-------+
+| Field      | Type | Null | Key | Default | Extra |
++------------+------+------+-----+---------+-------+
+| Visitor_ID | int  | NO   | PRI | NULL    |       |
+| Artwork_ID | int  | NO   | PRI | NULL    |       |
++------------+------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc guide;
++--------------+---------------------------+------+-----+---------+-------+
+| Field        | Type                      | Null | Key | Default | Extra |
++--------------+---------------------------+------+-----+---------+-------+
+| Guide_ID     | int                       | NO   | PRI | NULL    |       |
+| Name         | varchar(20)               | NO   |     | NULL    |       |
+| Phone_number | varchar(10)               | NO   |     | NULL    |       |
+| rating       | enum('1','2','3','4','5') | YES  |     | NULL    |       |
++--------------+---------------------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc guided_tour;
++--------------+-----------+------+-----+-------------------+-------------------+
+| Field        | Type      | Null | Key | Default           | Extra             |
++--------------+-----------+------+-----+-------------------+-------------------+
+| Tour_ID      | int       | NO   | PRI | NULL              |                   |
+| Guide_ID     | int       | NO   | MUL | NULL              |                   |
+| booking_time | timestamp | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| tour_date    | date      | NO   |     | NULL              |                   |
++--------------+-----------+------+-----+-------------------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql> desc review;
++-------------+---------------------------+------+-----+-----------+-------------------+
+| Field       | Type                      | Null | Key | Default   | Extra             |
++-------------+---------------------------+------+-----+-----------+-------------------+
+| Review_ID   | int                       | NO   | PRI | NULL      |                   |
+| Artwork_ID  | int                       | YES  |     | NULL      |                   |
+| Visitor_ID  | int                       | YES  |     | NULL      |                   |
+| rating      | enum('1','2','3','4','5') | YES  |     | NULL      |                   |
+| comment     | varchar(100)              | YES  |     | N/A       |                   |
+| Review_date | date                      | NO   |     | curdate() | DEFAULT_GENERATED |
++-------------+---------------------------+------+-----+-----------+-------------------+
+6 rows in set (0.00 sec)
+
+mysql> desc ticket;
++---------------+------+------+-----+---------+-------+
+| Field         | Type | Null | Key | Default | Extra |
++---------------+------+------+-----+---------+-------+
+| Ticket_ID     | int  | NO   | PRI | NULL    |       |
+| date_of_visit | date | NO   |     | NULL    |       |
+| booking_date  | date | NO   |     | NULL    |       |
++---------------+------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc visitor;
++--------------+-------------+------+-----+---------+----------------+
+| Field        | Type        | Null | Key | Default | Extra          |
++--------------+-------------+------+-----+---------+----------------+
+| Visitor_ID   | int         | NO   | PRI | NULL    | auto_increment |
+| Ticket_ID    | int         | NO   | MUL | NULL    |                |
+| Name         | varchar(30) | NO   |     | NULL    |                |
+| Email_ID     | varchar(40) | YES  |     | NULL    |                |
+| Phone_Number | varchar(10) | NO   |     | NULL    |                |
++--------------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> desc visitor_log;
++------------+-----------+------+-----+---------+-------+
+| Field      | Type      | Null | Key | Default | Extra |
++------------+-----------+------+-----+---------+-------+
+| Log_ID     | int       | NO   | PRI | NULL    |       |
+| Visitor_ID | int       | YES  | MUL | NULL    |       |
+| entry_time | timestamp | NO   |     | NULL    |       |
+| exit_time  | timestamp | NO   |     | NULL    |       |
++------------+-----------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc visitor_tag;
++---------------+------+------+-----+---------+----------------+
+| Field         | Type | Null | Key | Default | Extra          |
++---------------+------+------+-----+---------+----------------+
+| Tag_ID        | int  | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID    | int  | YES  | MUL | NULL    |                |
+| Assigned_Date | date | NO   |     | NULL    |                |
++---------------+------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> -- Inserting sample data into the 'artwork' table
+mysql> INSERT INTO artwork (Title, Artist, description, Published_date, Ranking) VALUES
+    -> ('Rangoli Dreams', 'Aarav Sharma', 'Vibrant traditional Indian rangoli art', '2023-01-15', 4),
+    -> ('Golden Temple Reflections', 'Anaya Kapoor', 'Photograph capturing the beauty of the Golden Temple', '2023-02-28', 5),
+    -> ('Nature's Symphony', 'Aaradhya Singh', 'Abstract painting inspired by nature', '2023-04-10', 3),
+
+    '> ('Dance of Colors', 'Aryan Patel', 'Expressive dance-themed artwork', '2023-05-20', 4),
+    '> ('Saree Elegance', 'Dia Mehra', 'Digital art showcasing the beauty of traditional sarees', '2023-07-01', 5),
+    '> ('Mystic Taj Mahal', 'Kabir Verma', 'Painting depicting the Taj Mahal at dawn', '2023-08-15', 4),
+
+    '> ('Floral Fusion', 'Ishita Yadav', 'Mixed media artwork combining flowers and colors', '2023-09-30', 3),
+    '> ('Kathak Rhythms', 'Vivaan Reddy', 'Capture of the graceful movements of Kathak dance', '2023-10-25', 5),
+    '> ('Sacred Cow', 'Zara Kapoor', 'Sculpture honoring the sacred cow in Indian culture', '2023-11-11', 4),
+    '> ('Unity in Diversity', 'Kavi Sharma', 'Digital art symbolizing India\'s cultural diversity', '2023-12-05', 5);
+ERROR:
+Unknown command '\''.
+    '>
+    '> -- Inserting sample data into the 'artwork_view' table
+    '> INSERT INTO artwork_view (Visitor_ID, Artwork_ID) VALUES
+    '> (1, 1),
+    '> (2, 2),
+    '> (3, 3),
+    '> (4, 4),
+    '> (5, 5),
+    '> (6, 6),
+    '> (7, 7),
+    '> (8, 8),
+    '> (9, 9),
+    '> (10, 10);
+    '>
+    '> -- Inserting sample data into the 'guide' table
+    '> INSERT INTO guide (Name, Phone_number, rating) VALUES
+    '> ('Aarav Khanna', '123-456-7890', '5'),
+    '> ('Ananya Gupta', '987-654-3210', '4'),
+    '> ('Mohit Singh', '555-111-2233', '3'),
+    '> ('Ishani Patel', '999-888-7777', '4'),
+    '> ('Raj Malhotra', '444-333-2222', '2'),
+    '> ('Kavya Kapoor', '111-222-3333', '5'),
+    '> ('Arjun Sharma', '666-555-4444', '3'),
+    '> ('Anvi Verma', '333-444-5555', '4'),
+    '> ('Rohan Yadav', '888-999-0000', '5'),
+    '> ('Zara Khan', '222-333-4444', '3');
+    '>
+    '> -- Inserting sample data into the 'guided_tour' table
+    '> INSERT INTO guided_tour (Guide_ID, tour_date) VALUES
+    '> (1, '2023-01-10'),
+    '> (2, '2023-02-20'),
+    '> (3, '2023-03-15'),
+    '> (4, '2023-04-05'),
+    '> (5, '2023-05-25'),
+    '> (6, '2023-06-10'),
+    '> (7, '2023-07-15'),
+    '> (8, '2023-08-05'),
+    '> (9, '2023-09-20'),
+    '> (10, '2023-10-15');
+    '>
+    '> -- Inserting sample data into the 'review' table
+    '> INSERT INTO review (Artwork_ID, Visitor_ID, rating, comment, Review_date) VALUES
+    '> (1, 1, '4', 'Beautiful representation of Indian art!', '2023-01-12'),
+    '> (2, 2, '5', 'Captured the essence of the Golden Temple perfectly.', '2023-03-01'),
+    '> (3, 3, '3', 'Not my style, but interesting.', '2023-04-15'),
+    '> (4, 4, '4', 'Expressive and vibrant!', '2023-05-21'),
+    '> (5, 5, '5', 'Saree art is stunning!', '2023-07-02'),
+    '> (6, 6, '4', 'Taj Mahal painting is enchanting.', '2023-08-16'),
+    '> (7, 7, '3', 'Interesting mix of flowers and colors.', '2023-09-30'),
+    '> (8, 8, '5', 'Kathak dance captured beautifully.', '2023-10-26'),
+    '> (9, 9, '4', 'Sculpture is a unique representation.', '2023-11-12'),
+    '> (10, 10, '5', 'Symbolizes India\'s diversity beautifully.', '2023-12-06');
+ERROR:
+Unknown command '\''.
+    '>
+    '> -- Inserting sample data into the 'ticket' table
+    '> INSERT INTO ticket (date_of_visit, booking_date) VALUES
+    '> ('2023-01-10', '2022-12-25'),
+    '> ('2023-02-20', '2023-02-01'),
+    '> ('2023-03-15', '2023-02-28'),
+    '> ('2023-04-05', '2023-03-20'),
+    '> ('2023-05-25', '2023-05-10'),
+    '> ('2023-06-10', '2023-05-25'),
+    '> ('2023-07-15', '2023-06-01'),
+    '> ('2023-08-05', '2023-07-20'),
+    '> ('2023-09-20', '2023-08-05'),
+    '> ('2023-10-15', '2023-09-10');
+    '>
+    '> -- Inserting sample data into the 'visitor' table
+    '> INSERT INTO visitor (Ticket_ID, Name, Email_ID, Phone_Number) VALUES
+    '> (1, 'Aarav Sharma', 'aarav@example.com', '123-456-7890'),
+    '> (2, 'Anaya Kapoor', 'anaya@example.com', '987-654-3210'),
+    '> (3, 'Aaradhya Singh', 'aaradhya@example.com', '555-111-2233'),
+    '> (4, 'Aryan Patel', 'aryan@example.com', '999-888-7777'),
+    '> (5, 'Dia Mehra', 'dia@example.com', '444-333-2222'),
+    '> (6, 'Kabir Verma', 'kabir@example.com', '111-222-3333'),
+    '> (7, 'Ishita Yadav', 'ishita@example.com', '666-777-8888'),
+    '> (8, 'Vivaan Reddy', 'vivaan@example.com', '333-444-5555'),
+    '> (9, 'Zara Kapoor', 'zara@example.com', '888-999-0000'),
+    '> (10, 'Kavi Sharma', 'kavi@example.com', '222-333-4444');
+    '>
+    '> -- Inserting sample data into the 'visitor_log' table
+    '> INSERT INTO visitor_log (Visitor_ID, entry_time, exit_time) VALUES
+    '> (1, '2023-01-10 10:00:00', '2023-01-10 12:00:00'),
+    '> (2, '2023-02-20 11:30:00', '2023-02-20 14:00:00'),
+    '> (3, '2023-03-15 09:45:00', '2023-03-15 11:30:00'),
+    '> (4, '2023-04-05 13:00:00', '2023-04-05 15:30:00'),
+    '> (5, '2023-05-25 10:30:00', '2023-05-25 13:00:00'),
+    '> (6, '2023-06-10 14:00:00', '2023-06-10 16:30:00'),
+    '> (7, '2023-07-15 11:00:00', '2023-07-15 13:30:00'),
+    '> (8, '2023-08-05 12:30:00', '2023-08-05 15:00:00'),
+    '> (9, '2023-09-20 09:00:00', '2023-09-20 11:30:00'),
+    '> (10, '2023-10-15 10:45:00', '2023-10-15 13:15:00');
+    '>
+    '> -- Inserting sample data into the 'visitor_tag' table
+    '> INSERT INTO visitor_tag (Visitor_ID, Assigned_Date) VALUES
+    '> (1, '2023-01-10'),
+    '> (2, '2023-02-20'),
+    '> (3, '2023-03-15'),
+    '> (4, '2023-04-05'),
+    '> (5, '2023-05-25'),
+    '> (6, '2023-06-10'),
+    '> (7, '2023-07-15'),
+    '> (8, '2023-08-05'),
+    '> (9, '2023-09-20'),
+    '> (10, '2023-10-15');
+    '>
+    '>
+    '> ;
+    '> ^C
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql> -- Inserting sample data into the 'artwork' table
+mysql> INSERT INTO artwork (Title, Artist, description, Published_date, Ranking) VALUES
+    -> ('Rangoli Dreams', 'Aarav Sharma', 'Vibrant traditional Indian rangoli art', '2023-01-15', 4),
+    -> ('Golden Temple Reflections', 'Anaya Kapoor', 'Photograph capturing the beauty of the Golden Temple', '2023-02-28', 5),
+    -> ('Natural Symphony', 'Aaradhya Singh', 'Abstract painting inspired by nature', '2023-04-10', 3),
+    -> ('Dance of Colors', 'Aryan Patel', 'Expressive dance-themed artwork', '2023-05-20', 4),
+    -> ('Saree Elegance', 'Dia Mehra', 'Digital art showcasing the beauty of traditional sarees', '2023-07-01', 5),
+    -> ('Mystic Taj Mahal', 'Kabir Verma', 'Painting depicting the Taj Mahal at dawn', '2023-08-15', 4),
+
+    -> ('Floral Fusion', 'Ishita Yadav', 'Mixed media artwork combining flowers and colors', '2023-09-30', 3),
+    -> ('Kathak Rhythms', 'Vivaan Reddy', 'Capture of the graceful movements of Kathak dance', '2023-10-25', 5),
+    -> ('Sacred Cow', 'Zara Kapoor', 'Sculpture honoring the sacred cow in Indian culture', '2023-11-11', 4),
+    -> ('Unity in Diversity', 'Kavi Sharma', 'Digital art symbolizing Indian cultural diversity', '2023-12-05', 5);
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Inserting sample data into the 'artwork_view' table
+mysql> INSERT INTO artwork_view (Visitor_ID, Artwork_ID) VALUES
+    -> (1, 1),
+    -> (2, 2),
+    -> (3, 3),
+    -> (4, 4),
+    -> (5, 5),
+    -> (6, 6),
+    -> (7, 7),
+    -> (8, 8),
+    -> (9, 9),
+    -> (10, 10);
+Query OK, 10 rows affected (0.00 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Inserting sample data into the 'guide' table
+mysql> INSERT INTO guide (Name, Phone_number, rating) VALUES
+    -> ('Aarav Khanna', '123-456-7890', '5'),
+    -> ('Ananya Gupta', '987-654-3210', '4'),
+    -> ('Mohit Singh', '555-111-2233', '3'),
+    -> ('Ishani Patel', '999-888-7777', '4'),
+    -> ('Raj Malhotra', '444-333-2222', '2'),
+    -> ('Kavya Kapoor', '111-222-3333', '5'),
+    -> ('Arjun Sharma', '666-555-4444', '3'),
+    -> ('Anvi Verma', '333-444-5555', '4'),
+    -> ('Rohan Yadav', '888-999-0000', '5'),
+    -> ('Zara Khan', '222-333-4444', '3');
+ERROR 1406 (22001): Data too long for column 'Phone_number' at row 1
+mysql>
+mysql> -- Inserting sample data into the 'guided_tour' table
+mysql> INSERT INTO guided_tour (Guide_ID, tour_date) VALUES
+    -> (1, '2023-01-10'),
+    -> (2, '2023-02-20'),
+    -> (3, '2023-03-15'),
+    -> (4, '2023-04-05'),
+    -> (5, '2023-05-25'),
+    -> (6, '2023-06-10'),
+    -> (7, '2023-07-15'),
+    -> (8, '2023-08-05'),
+    -> (9, '2023-09-20'),
+    -> (10, '2023-10-15');
+ERROR 1364 (HY000): Field 'Tour_ID' doesn't have a default value
+mysql>
+mysql> -- Inserting sample data into the 'review' table
+mysql> INSERT INTO review (Artwork_ID, Visitor_ID, rating, comment, Review_date) VALUES
+    -> (1, 1, '4', 'Beautiful representation of Indian art!', '2023-01-12'),
+    -> (2, 2, '5', 'Captured the essence of the Golden Temple perfectly.', '2023-03-01'),
+    -> (3, 3, '3', 'Not my style, but interesting.', '2023-04-15'),
+    -> (4, 4, '4', 'Expressive and vibrant!', '2023-05-21'),
+    -> (5, 5, '5', 'Saree art is stunning!', '2023-07-02'),
+    -> (6, 6, '4', 'Taj Mahal painting is enchanting.', '2023-08-16'),
+    -> (7, 7, '3', 'Interesting mix of flowers and colors.', '2023-09-30'),
+    -> (8, 8, '5', 'Kathak dance captured beautifully.', '2023-10-26'),
+    -> (9, 9, '4', 'Sculpture is a unique representation.', '2023-11-12'),
+    -> (10, 10, '5', 'Symbolizes Indian diversity beautifully.', '2023-12-06');
+ERROR 1364 (HY000): Field 'Review_ID' doesn't have a default value
+mysql>
+mysql> -- Inserting sample data into the 'ticket' table
+mysql> INSERT INTO ticket (date_of_visit, booking_date) VALUES
+    -> ('2023-01-10', '2022-12-25'),
+    -> ('2023-02-20', '2023-02-01'),
+    -> ('2023-03-15', '2023-02-28'),
+    -> ('2023-04-05', '2023-03-20'),
+    -> ('2023-05-25', '2023-05-10'),
+    -> ('2023-06-10', '2023-05-25'),
+    -> ('2023-07-15', '2023-06-01'),
+    -> ('2023-08-05', '2023-07-20'),
+    -> ('2023-09-20', '2023-08-05'),
+    -> ('2023-10-15', '2023-09-10');
+ERROR 1364 (HY000): Field 'Ticket_ID' doesn't have a default value
+mysql>
+mysql> -- Inserting sample data into the 'visitor' table
+mysql> INSERT INTO visitor (Ticket_ID, Name, Email_ID, Phone_Number) VALUES
+    -> (1, 'Aarav Sharma', 'aarav@example.com', '123-456-7890'),
+    -> (2, 'Anaya Kapoor', 'anaya@example.com', '987-654-3210'),
+    -> (3, 'Aaradhya Singh', 'aaradhya@example.com', '555-111-2233'),
+    -> (4, 'Aryan Patel', 'aryan@example.com', '999-888-7777'),
+    -> (5, 'Dia Mehra', 'dia@example.com', '444-333-2222'),
+    -> (6, 'Kabir Verma', 'kabir@example.com', '111-222-3333'),
+    -> (7, 'Ishita Yadav', 'ishita@example.com', '666-777-8888'),
+    -> (8, 'Vivaan Reddy', 'vivaan@example.com', '333-444-5555'),
+    -> (9, 'Zara Kapoor', 'zara@example.com', '888-999-0000'),
+    -> (10, 'Kavi Sharma', 'kavi@example.com', '222-333-4444');
+ERROR 1406 (22001): Data too long for column 'Phone_Number' at row 1
+mysql>
+mysql> -- Inserting sample data into the 'visitor_log' table
+mysql> INSERT INTO visitor_log (Visitor_ID, entry_time, exit_time) VALUES
+    -> (1, '2023-01-10 10:00:00', '2023-01-10 12:00:00'),
+    -> (2, '2023-02-20 11:30:00', '2023-02-20 14:00:00'),
+    -> (3, '2023-03-15 09:45:00', '2023-03-15 11:30:00'),
+    -> (4, '2023-04-05 13:00:00', '2023-04-05 15:30:00'),
+    -> (5, '2023-05-25 10:30:00', '2023-05-25 13:00:00'),
+    -> (6, '2023-06-10 14:00:00', '2023-06-10 16:30:00'),
+    -> (7, '2023-07-15 11:00:00', '2023-07-15 13:30:00'),
+    -> (8, '2023-08-05 12:30:00', '2023-08-05 15:00:00'),
+    -> (9, '2023-09-20 09:00:00', '2023-09-20 11:30:00'),
+    -> (10, '2023-10-15 10:45:00', '2023-10-15 13:15:00');
+ERROR 1364 (HY000): Field 'Log_ID' doesn't have a default value
+mysql>
+mysql> -- Inserting sample data into the 'visitor_tag' table
+mysql> INSERT INTO visitor_tag (Visitor_ID, Assigned_Date) VALUES
+    -> (1, '2023-01-10'),
+    -> (2, '2023-02-20'),
+    -> (3, '2023-03-15'),
+    -> (4, '2023-04-05'),
+    -> (5, '2023-05-25'),
+    -> (6, '2023-06-10'),
+    -> (7, '2023-07-15'),
+    -> (8, '2023-08-05'),
+    -> (9, '2023-09-20'),
+    -> (10, '2023-10-15');
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`agms`.`visitor_tag`, CONSTRAINT `visitor_tag_ibfk_1` FOREIGN KEY (`Visitor_ID`) REFERENCES `visitor` (`Visitor_ID`))
+mysql>
+mysql>
+mysql>
+mysql>
+mysql>
+mysql> INSERT INTO guide (Name, Phone_number, rating) VALUES
+    -> ('Aarav Khanna', '1234567890', '5'),
+    -> ('Ananya Gupta', '9876543210', '4'),
+    -> ('Mohit Singh', '5551112233', '3'),
+    -> ('Ishani Patel', '9998887777', '4'),
+    -> ('Raj Malhotra', '4443332222', '2'),
+    -> ('Kavya Kapoor', '1112223333', '5'),
+    -> ('Arjun Sharma', '6665554444', '3'),
+    -> ('Anvi Verma', '3334445555', '4'),
+    -> ('Rohan Yadav', '8889990000', '5'),
+    -> ('Zara Khan', '2223334444', '3');
+ERROR 1364 (HY000): Field 'Guide_ID' doesn't have a default value
+mysql>
+mysql>
+mysql> desc guide;
++--------------+---------------------------+------+-----+---------+-------+
+| Field        | Type                      | Null | Key | Default | Extra |
++--------------+---------------------------+------+-----+---------+-------+
+| Guide_ID     | int                       | NO   | PRI | NULL    |       |
+| Name         | varchar(20)               | NO   |     | NULL    |       |
+| Phone_number | varchar(10)               | NO   |     | NULL    |       |
+| rating       | enum('1','2','3','4','5') | YES  |     | NULL    |       |
++--------------+---------------------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> ALTER TABLE guide MODIFY Guide_ID INT AUTO_INCREMENT;
+ERROR 1833 (HY000): Cannot change column 'Guide_ID': used in a foreign key constraint 'guided_tour_ibfk_1' of table 'agms.guided_tour'
+mysql>
+mysql>
+mysql>
+mysql> desc guided_tour;
++--------------+-----------+------+-----+-------------------+-------------------+
+| Field        | Type      | Null | Key | Default           | Extra             |
++--------------+-----------+------+-----+-------------------+-------------------+
+| Tour_ID      | int       | NO   | PRI | NULL              |                   |
+| Guide_ID     | int       | NO   | MUL | NULL              |                   |
+| booking_time | timestamp | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| tour_date    | date      | NO   |     | NULL              |                   |
++--------------+-----------+------+-----+-------------------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> alter table guided_tour drop guided_tour_ibfk_1;
+ERROR 1091 (42000): Can't DROP 'guided_tour_ibfk_1'; check that column/key exists
+mysql> alter table guided_tour drop foreign key guided_tour_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE guide MODIFY Guide_ID INT AUTO_INCREMENT;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table guided_tour add foreign key (guide_id) references guide(guide_id);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql>
+mysql>
+mysql> INSERT INTO guide (Name, Phone_number, rating) VALUES
+    -> ('Aarav Khanna', '1234567890', '5'),
+    -> ('Ananya Gupta', '9876543210', '4'),
+    -> ('Mohit Singh', '5551112233', '3'),
+    -> ('Ishani Patel', '9998887777', '4'),
+    -> ('Raj Malhotra', '4443332222', '2'),
+    -> ('Kavya Kapoor', '1112223333', '5'),
+    -> ('Arjun Sharma', '6665554444', '3'),
+    -> ('Anvi Verma', '3334445555', '4'),
+    -> ('Rohan Yadav', '8889990000', '5'),
+    -> ('Zara Khan', '2223334444', '3');
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql>
+mysql> INSERT INTO guided_tour (Guide_ID, tour_date) VALUES
+    -> (1, '2023-01-10'),
+    -> (2, '2023-02-20'),
+    -> (3, '2023-03-15'),
+    -> (4, '2023-04-05'),
+    -> (5, '2023-05-25'),
+    -> (6, '2023-06-10'),
+    -> (7, '2023-07-15'),
+    -> (8, '2023-08-05'),
+    -> (9, '2023-09-20'),
+    -> (10, '2023-10-15');
+ERROR 1364 (HY000): Field 'Tour_ID' doesn't have a default value
+mysql>

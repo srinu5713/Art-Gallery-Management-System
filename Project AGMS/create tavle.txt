@@ -1,0 +1,139 @@
+How to run the Art Gallery Management System (agms) Project
+1. Download the zip file
+
+2. Extract the file and copy agms folder
+
+3.Paste inside root directory(for xampp xampp/htdocs, for wamp wamp/www, for lamp var/www/HTML)
+
+4.Open PHPMyAdmin (http://localhost/phpmyadmin)
+
+5. Create a database with the name agmsdb
+
+6. Import agmsdb.sql file(given inside the zip package in the SQL file folder)
+
+7. Run the script http://localhost/agms
+
+Credential for Admin panel :
+Username: admin
+Password: Test@123
+
+-- Inserting sample data into the 'artwork' table
+INSERT INTO artwork (Title, Artist, description, Published_date, Ranking) VALUES
+('Rangoli Dreams', 'Aarav Sharma', 'Vibrant traditional Indian rangoli art', '2023-01-15', 4),
+('Golden Temple Reflections', 'Anaya Kapoor', 'Photograph capturing the beauty of the Golden Temple', '2023-02-28', 5),
+('Natural Symphony', 'Aaradhya Singh', 'Abstract painting inspired by nature', '2023-04-10', 3),
+('Dance of Colors', 'Aryan Patel', 'Expressive dance-themed artwork', '2023-05-20', 4),
+('Saree Elegance', 'Dia Mehra', 'Digital art showcasing the beauty of traditional sarees', '2023-07-01', 5),
+('Mystic Taj Mahal', 'Kabir Verma', 'Painting depicting the Taj Mahal at dawn', '2023-08-15', 4),
+('Floral Fusion', 'Ishita Yadav', 'Mixed media artwork combining flowers and colors', '2023-09-30', 3),
+('Kathak Rhythms', 'Vivaan Reddy', 'Capture of the graceful movements of Kathak dance', '2023-10-25', 5),
+('Sacred Cow', 'Zara Kapoor', 'Sculpture honoring the sacred cow in Indian culture', '2023-11-11', 4),
+('Unity in Diversity', 'Kavi Sharma', 'Digital art symbolizing Indian cultural diversity', '2023-12-05', 5);
+
+-- Inserting sample data into the 'artwork_view' table
+INSERT INTO artwork_view (Visitor_ID, Artwork_ID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+# ==============================================================================================
+
+--Inserting sample data into the 'guide' table
+INSERT INTO guide (Name, Phone_number, rating) VALUES
+('Aarav Khanna', '1234567890', '5'),
+('Ananya Gupta', '9876543210', '4'),
+('Mohit Singh', '5551112233', '3'),
+('Ishani Patel', '9998887777', '4'),
+('Raj Malhotra', '4443332222', '2'),
+('Kavya Kapoor', '1112223333', '5'),
+('Arjun Sharma', '6665554444', '3'),
+('Anvi Verma', '3334445555', '4'),
+('Rohan Yadav', '8889990000', '5'),
+('Zara Khan', '2223334444', '3');
+
+-- Inserting sample data into the 'guided_tour' table
+INSERT INTO guided_tour (Guide_ID, tour_date) VALUES
+(1, '2023-01-10'),
+(2, '2023-02-20'),
+(3, '2023-03-15'),
+(4, '2023-04-05'),
+(5, '2023-05-25'),
+(6, '2023-06-10'),
+(7, '2023-07-15'),
+(8, '2023-08-05'),
+(9, '2023-09-20'),
+(10, '2023-10-15');
+
+-- Inserting sample data into the 'review' table
+INSERT INTO review (Artwork_ID, Visitor_ID, rating, comment, Review_date) VALUES
+(1, 1, '4', 'Beautiful representation of Indian art!', '2023-01-12'),
+(2, 2, '5', 'Captured the essence of the Golden Temple perfectly.', '2023-03-01'),
+(3, 3, '3', 'Not my style, but interesting.', '2023-04-15'),
+(4, 4, '4', 'Expressive and vibrant!', '2023-05-21'),
+(5, 5, '5', 'Saree art is stunning!', '2023-07-02'),
+(6, 6, '4', 'Taj Mahal painting is enchanting.', '2023-08-16'),
+(7, 7, '3', 'Interesting mix of flowers and colors.', '2023-09-30'),
+(8, 8, '5', 'Kathak dance captured beautifully.', '2023-10-26'),
+(9, 9, '4', 'Sculpture is a unique representation.', '2023-11-12'),
+(10, 10, '5', 'Symbolizes Indian diversity beautifully.', '2023-12-06');
+
+-- Inserting sample data into the 'ticket' table
+INSERT INTO ticket (date_of_visit, booking_date) VALUES
+('2023-01-10', '2022-12-25'),
+('2023-02-20', '2023-02-01'),
+('2023-03-15', '2023-02-28'),
+('2023-04-05', '2023-03-20'),
+('2023-05-25', '2023-05-10'),
+('2023-06-10', '2023-05-25'),
+('2023-07-15', '2023-06-01'),
+('2023-08-05', '2023-07-20'),
+('2023-09-20', '2023-08-05'),
+('2023-10-15', '2023-09-10');
+
+-- Inserting sample data into the 'visitor' table
+INSERT INTO visitor (Ticket_ID, Name, Email_ID, Phone_Number) VALUES
+(1, 'Aarav Sharma', 'aarav@example.com', '123-456-7890'),
+(2, 'Anaya Kapoor', 'anaya@example.com', '987-654-3210'),
+(3, 'Aaradhya Singh', 'aaradhya@example.com', '555-111-2233'),
+(4, 'Aryan Patel', 'aryan@example.com', '999-888-7777'),
+(5, 'Dia Mehra', 'dia@example.com', '444-333-2222'),
+(6, 'Kabir Verma', 'kabir@example.com', '111-222-3333'),
+(7, 'Ishita Yadav', 'ishita@example.com', '666-777-8888'),
+(8, 'Vivaan Reddy', 'vivaan@example.com', '333-444-5555'),
+(9, 'Zara Kapoor', 'zara@example.com', '888-999-0000'),
+(10, 'Kavi Sharma', 'kavi@example.com', '222-333-4444');
+
+-- Inserting sample data into the 'visitor_log' table
+INSERT INTO visitor_log (Visitor_ID, entry_time, exit_time) VALUES
+(1, '2023-01-10 10:00:00', '2023-01-10 12:00:00'),
+(2, '2023-02-20 11:30:00', '2023-02-20 14:00:00'),
+(3, '2023-03-15 09:45:00', '2023-03-15 11:30:00'),
+(4, '2023-04-05 13:00:00', '2023-04-05 15:30:00'),
+(5, '2023-05-25 10:30:00', '2023-05-25 13:00:00'),
+(6, '2023-06-10 14:00:00', '2023-06-10 16:30:00'),
+(7, '2023-07-15 11:00:00', '2023-07-15 13:30:00'),
+(8, '2023-08-05 12:30:00', '2023-08-05 15:00:00'),
+(9, '2023-09-20 09:00:00', '2023-09-20 11:30:00'),
+(10, '2023-10-15 10:45:00', '2023-10-15 13:15:00');
+
+-- Inserting sample data into the 'visitor_tag' table
+INSERT INTO visitor_tag (Visitor_ID, Assigned_Date) VALUES
+(1, '2023-01-10'),
+(2, '2023-02-20'),
+(3, '2023-03-15'),
+(4, '2023-04-05'),
+(5, '2023-05-25'),
+(6, '2023-06-10'),
+(7, '2023-07-15'),
+(8, '2023-08-05'),
+(9, '2023-09-20'),
+(10, '2023-10-15');
+
+

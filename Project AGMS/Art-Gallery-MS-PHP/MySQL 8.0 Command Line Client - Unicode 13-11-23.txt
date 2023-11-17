@@ -1,0 +1,1094 @@
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8854
+Server version: 8.0.34 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use agms
+Database changed
+mysql> desc guide;
++--------------+---------------------------+------+-----+---------+----------------+
+| Field        | Type                      | Null | Key | Default | Extra          |
++--------------+---------------------------+------+-----+---------+----------------+
+| Guide_ID     | int                       | NO   | PRI | NULL    | auto_increment |
+| Name         | varchar(20)               | NO   |     | NULL    |
+      |
+| Phone_number | varchar(10)               | NO   |     | NULL    |
+      |
+| rating       | enum('1','2','3','4','5') | YES  |     | NULL    |
+      |
++------desc guide;-------------------------+------+-----+---------+----------------+
++--------------+---------------------------+------+-----+---------+----------------+
+| Field        | Type                      | Null | Key | Default | Extra          |
++--------------+---------------------------+------+-----+---------+----------------+
+| Guide_ID     | int                       | NO   | PRI | NULL    | auto_increment |
+| Name         | varchar(20)               | NO   |     | NULL    |                |
+| Phone_number | varchar(10)               | NO   |     | NULL    |                |
+| rating       | enum('1','2','3','4','5') | YES  |     | NULL    |                |
++--------------+---------------------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql> desc guided_tour;
++--------------+-----------+------+-----+-------------------+-------------------+
+| Field        | Type      | Null | Key | Default           | Extra             |
++--------------+-----------+------+-----+-------------------+-------------------+
+| Tour_ID      | int       | NO   | PRI | NULL              | auto_increment    |
+| Guide_ID     | int       | NO   | MUL | NULL              |                   |
+| booking_time | timestamp | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| tour_date    | date      | NO   |     | NULL              |                   |
++--------------+-----------+------+-----+-------------------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql> alter table guided_tour add slot enum('1','2','3','4','5') NOT NULL;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from guided_tour;
++---------+----------+---------------------+------------+------+
+| Tour_ID | Guide_ID | booking_time        | tour_date  | slot |
++---------+----------+---------------------+------------+------+
+|       1 |        1 | 2023-11-12 12:28:24 | 2023-11-10 | 1    |
+|       2 |        2 | 2023-11-12 12:28:24 | 2023-11-11 | 1    |
+|       3 |        3 | 2023-11-12 12:28:24 | 2023-11-12 | 1    |
+|       4 |        4 | 2023-11-12 12:28:24 | 2023-11-13 | 1    |
+|       5 |        5 | 2023-11-12 12:28:24 | 2023-11-14 | 1    |
++---------+----------+---------------------+------------+------+
+5 rows in set (0.00 sec)
+
+mysql> ALTER table guided_tour add booking_visitor_id int NOT NULL;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE guided_tour ADD FOREIGN KEY(booking_visitor_id) REFERENCES Visitor(visitor_id);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`agms`.`#sql-1aa0_2296`, CONSTRAINT `guided_tour_ibfk_2` FOREIGN KEY (`booking_visitor_id`) REFERENCES `visitor` (`Visitor_ID`))
+mysql> select * from guided_tour;
++---------+----------+---------------------+------------+------+--------------------+
+| Tour_ID | Guide_ID | booking_time        | tour_date  | slot | booking_visitor_id |
++---------+----------+---------------------+------------+------+--------------------+
+|       1 |        1 | 2023-11-12 12:28:24 | 2023-11-10 | 1    |                  0 |
+|       2 |        2 | 2023-11-12 12:28:24 | 2023-11-11 | 1    |                  0 |
+|       3 |        3 | 2023-11-12 12:28:24 | 2023-11-12 | 1    |                  0 |
+|       4 |        4 | 2023-11-12 12:28:24 | 2023-11-13 | 1    |                  0 |
+|       5 |        5 | 2023-11-12 12:28:24 | 2023-11-14 | 1    |                  0 |
++---------+----------+---------------------+------------+------+--------------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from visitor;
++------------+-----------+-----------------+-------------------------+--------------+
+| Visitor_ID | Ticket_ID | Name            | Email_ID                | Phone_Number |
++------------+-----------+-----------------+-------------------------+--------------+
+|          1 |         1 | Arun Mouli      | amouli@example.com      | 9715497891   |
+|          2 |         2 | Surya Vardhan   | svardhan@example.com    | 8765487109   |
+|          3 |         3 | Rahul Sharma    | rsharma@example.com     | 7654789145   |
+|          4 |         4 | Priyanka Dongre | DongrePriya@example.com | 7804521457   |
+|          5 |         5 | Vaibhav Singh   | vaibhav@example.com     | 7894591472   |
++------------+-----------+-----------------+-------------------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from ticket;
++-----------+------------+---------------+--------------+
+| Ticket_ID | Visitor_ID | date_of_visit | booking_date |
++-----------+------------+---------------+--------------+
+|         1 |          1 | 2023-11-10    | 2023-11-09   |
+|         2 |          2 | 2023-11-11    | 2023-11-10   |
+|         3 |          3 | 2023-11-12    | 2023-11-11   |
+|         4 |          4 | 2023-11-13    | 2023-11-12   |
+|         5 |          5 | 2023-11-14    | 2023-11-13   |
++-----------+------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql>  UPDATE guided_tour SET booking_visitor_id=(SELECT visitor_id FROM ticket WHERE ticket.date_of_visit=guided_tour.tour_date)
+    -> ;
+Query OK, 5 rows affected (0.00 sec)
+Rows matched: 5  Changed: 5  Warnings: 0
+
+mysql> select * from guided_tour;
++---------+----------+---------------------+------------+------+--------------------+
+| Tour_ID | Guide_ID | booking_time        | tour_date  | slot | booking_visitor_id |
++---------+----------+---------------------+------------+------+--------------------+
+|       1 |        1 | 2023-11-12 12:28:24 | 2023-11-10 | 1    |                  1 |
+|       2 |        2 | 2023-11-12 12:28:24 | 2023-11-11 | 1    |                  2 |
+|       3 |        3 | 2023-11-12 12:28:24 | 2023-11-12 | 1    |                  3 |
+|       4 |        4 | 2023-11-12 12:28:24 | 2023-11-13 | 1    |                  4 |
+|       5 |        5 | 2023-11-12 12:28:24 | 2023-11-14 | 1    |                  5 |
++---------+----------+---------------------+------------+------+--------------------+
+5 rows in set (0.00 sec)
+
+mysql> ALTER TABLE guided_tour DROP COLUMN booking_visitor_id;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from visitor;
++------------+-----------+-----------------+-------------------------+--------------+
+| Visitor_ID | Ticket_ID | Name            | Email_ID                | Phone_Number |
++------------+-----------+-----------------+-------------------------+--------------+
+|          1 |         1 | Arun Mouli      | amouli@example.com      | 9715497891   |
+|          2 |         2 | Surya Vardhan   | svardhan@example.com    | 8765487109   |
+|          3 |         3 | Rahul Sharma    | rsharma@example.com     | 7654789145   |
+|          4 |         4 | Priyanka Dongre | DongrePriya@example.com | 7804521457   |
+|          5 |         5 | Vaibhav Singh   | vaibhav@example.com     | 7894591472   |
++------------+-----------+-----------------+-------------------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from ticket;
++-----------+------------+---------------+--------------+
+| Ticket_ID | Visitor_ID | date_of_visit | booking_date |
++-----------+------------+---------------+--------------+
+|         1 |          1 | 2023-11-10    | 2023-11-09   |
+|         2 |          2 | 2023-11-11    | 2023-11-10   |
+|         3 |          3 | 2023-11-12    | 2023-11-11   |
+|         4 |          4 | 2023-11-13    | 2023-11-12   |
+|         5 |          5 | 2023-11-14    | 2023-11-13   |
++-----------+------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from guided_tour;
++---------+----------+---------------------+------------+------+
+| Tour_ID | Guide_ID | booking_time        | tour_date  | slot |
++---------+----------+---------------------+------------+------+
+|       1 |        1 | 2023-11-12 12:28:24 | 2023-11-10 | 1    |
+|       2 |        2 | 2023-11-12 12:28:24 | 2023-11-11 | 1    |
+|       3 |        3 | 2023-11-12 12:28:24 | 2023-11-12 | 1    |
+|       4 |        4 | 2023-11-12 12:28:24 | 2023-11-13 | 1    |
+|       5 |        5 | 2023-11-12 12:28:24 | 2023-11-14 | 1    |
++---------+----------+---------------------+------------+------+
+5 rows in set (0.00 sec)
+
+mysql> desc login;
++----------+-------------------------+------+-----+---------+-------+
+| Field    | Type                    | Null | Key | Default | Extra |
++----------+-------------------------+------+-----+---------+-------+
+| username | varchar(25)             | NO   | PRI | NULL    |       |
+| password | varchar(25)             | NO   |     | NULL    |       |
+| type     | enum('Admin','Visitor') | NO   |     | NULL    |       |
++----------+-------------------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> ALTER TABLE login add visitor_id int;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from login;
++----------+----------+---------+------------+
+| username | password | type    | visitor_id |
++----------+----------+---------+------------+
+|          |          | Visitor |       NULL |
+| Admin    | pass     | Admin   |       NULL |
+| Arun     | vis1     | Visitor |       NULL |
+| Priyanka | vis0     | Visitor |       NULL |
+| Rahul    | vis7     | Visitor |       NULL |
+| Surya    | vis2     | Visitor |       NULL |
++----------+----------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from visitor;
++------------+-----------+-----------------+-------------------------+--------------+
+| Visitor_ID | Ticket_ID | Name            | Email_ID                | Phone_Number |
++------------+-----------+-----------------+-------------------------+--------------+
+|          1 |         1 | Arun Mouli      | amouli@example.com      | 9715497891   |
+|          2 |         2 | Surya Vardhan   | svardhan@example.com    | 8765487109   |
+|          3 |         3 | Rahul Sharma    | rsharma@example.com     | 7654789145   |
+|          4 |         4 | Priyanka Dongre | DongrePriya@example.com | 7804521457   |
+|          5 |         5 | Vaibhav Singh   | vaibhav@example.com     | 7894591472   |
++------------+-----------+-----------------+-------------------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> UPDATE login SET visitor_id=CASE
+    -> WHEN username="Arun" THEN visitor_id =1
+    -> WHEN username="Priyanka" THEN visitor_id =4
+    -> WHEN username="Rahul" THEN visitor_id =3
+    -> WHEN username="Surya" THEN visitor_id =2
+    -> END;
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 6  Changed: 0  Warnings: 0
+
+mysql> select * from login;
++----------+----------+---------+------------+
+| username | password | type    | visitor_id |
++----------+----------+---------+------------+
+|          |          | Visitor |       NULL |
+| Admin    | pass     | Admin   |       NULL |
+| Arun     | vis1     | Visitor |       NULL |
+| Priyanka | vis0     | Visitor |       NULL |
+| Rahul    | vis7     | Visitor |       NULL |
+| Surya    | vis2     | Visitor |       NULL |
++----------+----------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> UPDATE login SET visitor_id = CASE
+    ->     WHEN username = "Arun" THEN 1
+    ->     WHEN username = "Priyanka" THEN 4
+    ->     WHEN username = "Rahul" THEN 3
+    ->     WHEN username = "Surya" THEN 2
+    -> END;
+Query OK, 4 rows affected (0.00 sec)
+Rows matched: 6  Changed: 4  Warnings: 0
+
+mysql> select * from login;
++----------+----------+---------+------------+
+| username | password | type    | visitor_id |
++----------+----------+---------+------------+
+|          |          | Visitor |       NULL |
+| Admin    | pass     | Admin   |       NULL |
+| Arun     | vis1     | Visitor |          1 |
+| Priyanka | vis0     | Visitor |          4 |
+| Rahul    | vis7     | Visitor |          3 |
+| Surya    | vis2     | Visitor |          2 |
++----------+----------+---------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from ticket;
++-----------+------------+---------------+--------------+
+| Ticket_ID | Visitor_ID | date_of_visit | booking_date |
++-----------+------------+---------------+--------------+
+|         1 |          1 | 2023-11-10    | 2023-11-09   |
+|         2 |          2 | 2023-11-11    | 2023-11-10   |
+|         3 |          3 | 2023-11-12    | 2023-11-11   |
+|         4 |          4 | 2023-11-13    | 2023-11-12   |
+|         5 |          5 | 2023-11-14    | 2023-11-13   |
++-----------+------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from guided_tour;
++---------+----------+---------------------+------------+------+
+| Tour_ID | Guide_ID | booking_time        | tour_date  | slot |
++---------+----------+---------------------+------------+------+
+|       1 |        1 | 2023-11-12 12:28:24 | 2023-11-10 | 1    |
+|       2 |        2 | 2023-11-12 12:28:24 | 2023-11-11 | 1    |
+|       3 |        3 | 2023-11-12 12:28:24 | 2023-11-12 | 1    |
+|       4 |        4 | 2023-11-12 12:28:24 | 2023-11-13 | 1    |
+|       5 |        5 | 2023-11-12 12:28:24 | 2023-11-14 | 1    |
++---------+----------+---------------------+------------+------+
+5 rows in set (0.00 sec)
+
+mysql> select * from guide;
++----------+--------------+--------------+--------+
+| Guide_ID | Name         | Phone_number | rating |
++----------+--------------+--------------+--------+
+|        1 | Rajesh Kumar | 9876543210   | 4      |
+|        2 | Priya Sharma | 8765432109   | 5      |
+|        3 | Amit Singh   | 7654321098   | 3      |
+|        4 | Sanya Verma  | 6543210987   | 2      |
+|        5 | Vikas Patel  | 5432109876   | 4      |
++----------+--------------+--------------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from visitor;
++------------+-----------+-----------------+-------------------------+--------------+
+| Visitor_ID | Ticket_ID | Name            | Email_ID                | Phone_Number |
++------------+-----------+-----------------+-------------------------+--------------+
+|          1 |         1 | Arun Mouli      | amouli@example.com      | 9715497891   |
+|          2 |         2 | Surya Vardhan   | svardhan@example.com    | 8765487109   |
+|          3 |         3 | Rahul Sharma    | rsharma@example.com     | 7654789145   |
+|          4 |         4 | Priyanka Dongre | DongrePriya@example.com | 7804521457   |
+|          5 |         5 | Vaibhav Singh   | vaibhav@example.com     | 7894591472   |
++------------+-----------+-----------------+-------------------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from ticket;
++-----------+------------+---------------+--------------+
+| Ticket_ID | Visitor_ID | date_of_visit | booking_date |
++-----------+------------+---------------+--------------+
+|         1 |          1 | 2023-11-10    | 2023-11-09   |
+|         2 |          2 | 2023-11-11    | 2023-11-10   |
+|         3 |          3 | 2023-11-12    | 2023-11-11   |
+|         4 |          4 | 2023-11-13    | 2023-11-12   |
+|         5 |          5 | 2023-11-14    | 2023-11-13   |
++-----------+------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> desc visitor_transactions;
++--------------------+-----------+------+-----+---------+----------------+
+| Field              | Type      | Null | Key | Default | Extra          |
++--------------------+-----------+------+-----+---------+----------------+
+| Trans_ID           | int       | NO   | PRI | NULL    | auto_increment |
+| Booking_Visitor_ID | int       | NO   | MUL | NULL    |                |
+| No_of_Tickets      | int       | NO   |     | NULL    |                |
+| Time               | timestamp | YES  |     | NULL    |                |
++--------------------+-----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc login;
++------------+-------------------------+------+-----+---------+-------+
+| Field      | Type                    | Null | Key | Default | Extra |
++------------+-------------------------+------+-----+---------+-------+
+| username   | varchar(25)             | NO   | PRI | NULL    |       |
+| password   | varchar(25)             | NO   |     | NULL    |       |
+| type       | enum('Admin','Visitor') | NO   |     | NULL    |       |
+| visitor_id | int                     | YES  |     | NULL    |       |
++------------+-------------------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc visitors;
+ERROR 1146 (42S02): Table 'agms.visitors' doesn't exist
+mysql> desc visitor;
++--------------+-------------+------+-----+---------+----------------+
+| Field        | Type        | Null | Key | Default | Extra          |
++--------------+-------------+------+-----+---------+----------------+
+| Visitor_ID   | int         | NO   | PRI | NULL    | auto_increment |
+| Ticket_ID    | int         | NO   |     | NULL    |                |
+| Name         | varchar(30) | NO   |     | NULL    |                |
+| Email_ID     | varchar(40) | YES  |     | NULL    |                |
+| Phone_Number | varchar(10) | NO   |     | NULL    |                |
++--------------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> ALTER TABLE login ADD Name varchar(40) NOT NULL;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE login ADD email_id varchar(40);
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE login ADD phone_number varchar(10) CHECK(LENGTH(phone_number)=10);
+Query OK, 6 rows affected (0.03 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> select * from login;
++----------+----------+---------+------------+------+----------+--------------+
+| username | password | type    | visitor_id | Name | email_id | phone_number |
++----------+----------+---------+------------+------+----------+--------------+
+|          |          | Visitor |       NULL |      | NULL     | NULL         |
+| Admin    | pass     | Admin   |       NULL |      | NULL     | NULL         |
+| Arun     | vis1     | Visitor |          1 |      | NULL     | NULL         |
+| Priyanka | vis0     | Visitor |          4 |      | NULL     | NULL         |
+| Rahul    | vis7     | Visitor |          3 |      | NULL     | NULL         |
+| Surya    | vis2     | Visitor |          2 |      | NULL     | NULL         |
++----------+----------+---------+------------+------+----------+--------------+
+6 rows in set (0.00 sec)
+
+mysql> ALTER TABLE login DROP COLUMN phone_number;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE login ADD phone_number varchar(10) NOT NULL CHECK(LENGTH(phone_number)=10);
+ERROR 3819 (HY000): Check constraint 'login_chk_1' is violated.
+mysql> ALTER TABLE login DROP CONSTRAINT 'login_chk_1';
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''login_chk_1'' at line 1
+mysql> ALTER TABLE login DROP CONSTRAINT login_chk_1;
+ERROR 3940 (HY000): Constraint 'login_chk_1' does not exist.
+mysql>
+mysql>
+mysql>
+mysql> ALTER TABLE login ADD phone_number varchar(10) NOT NULL CHECK(LENGTH(phone_number)=10);
+ERROR 3819 (HY000): Check constraint 'login_chk_1' is violated.
+mysql>
+mysql>
+mysql> SHOW CREATE TABLE login;
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table | Create Table
+
+
+                               |
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| login | CREATE TABLE `login` (
+  `username` varchar(25) NOT NULL,
+  `password` varchar(25) NOT NULL,
+  `type` enum('Admin','Visitor') NOT NULL,
+  `visitor_id` int DEFAULT NULL,
+  `Name` varchar(40) NOT NULL,
+  `email_id` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> ALTER TABLE login ADD phone_number varchar(10) NOT NULL;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE login ADD CONSTRAINT check_ph_no CHECK(LENGTH(phone_number)=10);
+ERROR 3819 (HY000): Check constraint 'check_ph_no' is violated.
+mysql> SELECT * FROM login WHERE LENGTH(phone_number) != 10;
++----------+----------+---------+------------+------+----------+--------------+
+| username | password | type    | visitor_id | Name | email_id | phone_number |
++----------+----------+---------+------------+------+----------+--------------+
+|          |          | Visitor |       NULL |      | NULL     |              |
+| Admin    | pass     | Admin   |       NULL |      | NULL     |              |
+| Arun     | vis1     | Visitor |          1 |      | NULL     |              |
+| Priyanka | vis0     | Visitor |          4 |      | NULL     |              |
+| Rahul    | vis7     | Visitor |          3 |      | NULL     |              |
+| Surya    | vis2     | Visitor |          2 |      | NULL     |              |
++----------+----------+---------+------------+------+----------+--------------+
+6 rows in set (0.00 sec)
+
+mysql> ALTER TABLE login DROP COLUMN phone_number;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE login ADD phone_number varchar(10) NOT NULL CHECK(LENGTH(phone_number)=10);
+ERROR 3819 (HY000): Check constraint 'login_chk_1' is violated.
+mysql> SELECT * FROM login WHERE LENGTH(phone_number) != 10;
+ERROR 1054 (42S22): Unknown column 'phone_number' in 'where clause'
+mysql>
+mysql> desc login;
++------------+-------------------------+------+-----+---------+-------+
+| Field      | Type                    | Null | Key | Default | Extra |
++------------+-------------------------+------+-----+---------+-------+
+| username   | varchar(25)             | NO   | PRI | NULL    |       |
+| password   | varchar(25)             | NO   |     | NULL    |       |
+| type       | enum('Admin','Visitor') | NO   |     | NULL    |       |
+| visitor_id | int                     | YES  |     | NULL    |       |
+| Name       | varchar(40)             | NO   |     | NULL    |       |
+| email_id   | varchar(40)             | YES  |     | NULL    |       |
++------------+-------------------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> SHOW CREATE TABLE login;
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table | Create Table
+
+
+                               |
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| login | CREATE TABLE `login` (
+  `username` varchar(25) NOT NULL,
+  `password` varchar(25) NOT NULL,
+  `type` enum('Admin','Visitor') NOT NULL,
+  `visitor_id` int DEFAULT NULL,
+  `Name` varchar(40) NOT NULL,
+  `email_id` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> drop table login;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> select * from login;
+ERROR 1146 (42S02): Table 'agms.login' doesn't exist
+mysql>
+mysql>
+mysql> CREATE TABLE `login` (
+    ->   `username` varchar(25) NOT NULL,
+    ->   `password` varchar(25) NOT NULL,
+    ->   `type` enum('Admin','Visitor') NOT NULL,
+    ->   `user_id` int DEFAULT NULL,
+    ->   `Name` varchar(40) NOT NULL,
+    ->   `email_id` varchar(40) DEFAULT NULL,
+    ->   `phone_number` varchar(10) NOT NULL,
+    ->   CONSTRAINT `check_ph_no` CHECK (LENGTH(`phone_number`) = 10),
+    ->   PRIMARY KEY (`username`)
+    -> ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select * from visitor;
++------------+-----------+-----------------+-------------------------+--------------+
+| Visitor_ID | Ticket_ID | Name            | Email_ID                | Phone_Number |
++------------+-----------+-----------------+-------------------------+--------------+
+|          1 |         1 | Arun Mouli      | amouli@example.com      | 9715497891   |
+|          2 |         2 | Surya Vardhan   | svardhan@example.com    | 8765487109   |
+|          3 |         3 | Rahul Sharma    | rsharma@example.com     | 7654789145   |
+|          4 |         4 | Priyanka Dongre | DongrePriya@example.com | 7804521457   |
+|          5 |         5 | Vaibhav Singh   | vaibhav@example.com     | 7894591472   |
++------------+-----------+-----------------+-------------------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> INSERT INTO `login` (
+    ->   `username`,
+    ->   `password`,
+    ->   `type`,
+    ->   `user_id`,
+    ->   `Name`,
+    ->   `email_id`,
+    ->   `phone_number`
+    -> )
+    -> VALUES
+    ->   ('', '', 'Visitor', NULL, '', '', ''),
+    ->   ('Admin', 'pass', 'Admin', NULL, 'Admin', NULL, ''),
+    ->   ('Arun', 'vis1', 'Visitor', 1, 'Arun', 'amouli@example.com', '9715497891'),  -- Replace with actual values
+    ->   ('Priyanka', 'vis0', 'Visitor', 4, 'Priyanka', 'DongrePriya@example.com', '7804521457'),  -- Replace with actual values
+    ->   ('Rahul', 'vis7', 'Visitor', 3, 'Rahul', 'rsharma@example.com', '7654789145'),  -- Replace with actual values
+    ->   ('Surya', 'vis2', 'Visitor', 2, 'Surya', 'svardhan@example.com', '8765487109');
+ERROR 3819 (HY000): Check constraint 'check_ph_no' is violated.
+mysql> INSERT INTO `login` (
+    ->   `username`,
+    ->   `password`,
+    ->   `type`,
+    ->   `user_id`,
+    ->   `Name`,
+    ->   `email_id`,
+    ->   `phone_number`
+    -> )
+    -> VALUES
+    ->   ('Admin', 'pass', 'Admin', NULL, 'Admin', NULL, '9724238431'),
+    ->   ('Arun', 'vis1', 'Visitor', 1, 'Arun', 'amouli@example.com', '9715497891'),  -- Replace with actual values
+    ->   ('Priyanka', 'vis0', 'Visitor', 4, 'Priyanka', 'DongrePriya@example.com', '7804521457'),  -- Replace with actual values
+    ->   ('Rahul', 'vis7', 'Visitor', 3, 'Rahul', 'rsharma@example.com', '7654789145'),  -- Replace with actual values
+    ->   ('Surya', 'vis2', 'Visitor', 2, 'Surya', 'svardhan@example.com', '8765487109');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql> show create table visiotor;
+ERROR 1146 (42S02): Table 'agms.visiotor' doesn't exist
+mysql> show create table visitor;
++---------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table   | Create Table
+
+
+                                                                                       |
++---------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| visitor | CREATE TABLE `visitor` (
+  `Visitor_ID` int NOT NULL AUTO_INCREMENT,
+  `Ticket_ID` int NOT NULL,
+  `Name` varchar(30) NOT NULL,
+  `Email_ID` varchar(40) DEFAULT NULL,
+  `Phone_Number` varchar(10) NOT NULL,
+  PRIMARY KEY (`Visitor_ID`),
+  CONSTRAINT `visitor_chk_1` CHECK ((length(`Phone_Number`) = 10))
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++---------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> ALTER TABLE visitor DROP COLUMN Name,DROP COLUMN Email_ID,DROP COLUMN phone_number;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc visitor;
++------------+------+------+-----+---------+----------------+
+| Field      | Type | Null | Key | Default | Extra          |
++------------+------+------+-----+---------+----------------+
+| Visitor_ID | int  | NO   | PRI | NULL    | auto_increment |
+| Ticket_ID  | int  | NO   |     | NULL    |                |
++------------+------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> desc ticket;
++---------------+------+------+-----+---------+----------------+
+| Field         | Type | Null | Key | Default | Extra          |
++---------------+------+------+-----+---------+----------------+
+| Ticket_ID     | int  | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID    | int  | NO   | MUL | NULL    |                |
+| date_of_visit | date | NO   |     | NULL    |                |
+| booking_date  | date | NO   |     | NULL    |                |
++---------------+------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc visitor_transactions;
++--------------------+-----------+------+-----+---------+----------------+
+| Field              | Type      | Null | Key | Default | Extra          |
++--------------------+-----------+------+-----+---------+----------------+
+| Trans_ID           | int       | NO   | PRI | NULL    | auto_increment |
+| Booking_Visitor_ID | int       | NO   | MUL | NULL    |                |
+| No_of_Tickets      | int       | NO   |     | NULL    |                |
+| Time               | timestamp | YES  |     | NULL    |                |
++--------------------+-----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> ALTER TABLE ticket AlTER booking_date SET DEFAULT CURRENT_DATE();
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'CURRENT_DATE()' at line 1
+mysql> ALTER TABLE ticket AlTER booking_date SET DEFAULT CURRENT_DATE;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'CURRENT_DATE' at line 1
+mysql> ALTER TABLE ticket AlTER booking_date SET DEFAULT(CURRENT_DATE);
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql>
+mysql>
+mysql> desc ticket;
++---------------+------+------+-----+-----------+-------------------+
+| Field         | Type | Null | Key | Default   | Extra             |
++---------------+------+------+-----+-----------+-------------------+
+| Ticket_ID     | int  | NO   | PRI | NULL      | auto_increment    |
+| Visitor_ID    | int  | NO   | MUL | NULL      |                   |
+| date_of_visit | date | NO   |     | NULL      |                   |
+| booking_date  | date | NO   |     | curdate() | DEFAULT_GENERATED |
++---------------+------+------+-----+-----------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql> desc visitor;
++------------+------+------+-----+---------+----------------+
+| Field      | Type | Null | Key | Default | Extra          |
++------------+------+------+-----+---------+----------------+
+| Visitor_ID | int  | NO   | PRI | NULL    | auto_increment |
+| Ticket_ID  | int  | NO   |     | NULL    |                |
++------------+------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'visitor_log_ibfk_1' on table 'visitor_log'.
+mysql> ALTER TABLE visitor_log DROP FOREIGN KEY visitor_log;
+ERROR 1091 (42000): Can't DROP 'visitor_log'; check that column/key exists
+mysql> ALTER TABLE visitor_log DROP FOREIGN KEY visitor_log_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'visitor_tag_ibfk_1' on table 'visitor_tag'.
+mysql> ALTER TABLE visitor_log DROP FOREIGN KEY visitor_tag_ibfk_1;
+ERROR 1091 (42000): Can't DROP 'visitor_tag_ibfk_1'; check that column/key exists
+mysql> ALTER TABLE visitor_tag DROP FOREIGN KEY visitor_tag_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'review_ibfk_2' on table 'review'.
+mysql> ALTER TABLE visitor_log DROP FOREIGN KEY review_ibfk_2;
+ERROR 1091 (42000): Can't DROP 'review_ibfk_2'; check that column/key exists
+mysql> ALTER TABLE review DROP FOREIGN KEY review_ibfk_2;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'artwork_view_ibfk_1' on table 'artwork_view'.
+mysql> ALTER TABLE artwork_review DROP FOREIGN KEY artwork_view_ibfk_1;
+ERROR 1146 (42S02): Table 'agms.artwork_review' doesn't exist
+mysql> ALTER TABLE artwork_view DROP FOREIGN KEY artwork_view_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'artwork_log_ibfk_1' on table 'artwork_log'.
+mysql> ALTER TABLE artwork_log DROP FOREIGN KEY artwork_log_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'visitor_transactions_ibfk_1' on table 'visitor_transactions'.
+mysql> ALTER TABLE visitor_transactions DROP FOREIGN KEY visitor_transactions_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+ERROR 3730 (HY000): Cannot drop table 'visitor' referenced by a foreign key constraint 'ticket_ibfk_1' on table 'ticket'.
+mysql> ALTER TABLE ticket DROP FOREIGN KEY ticket_ibfk_1;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table visitor;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> desc ticket;
++---------------+------+------+-----+-----------+-------------------+
+| Field         | Type | Null | Key | Default   | Extra             |
++---------------+------+------+-----+-----------+-------------------+
+| Ticket_ID     | int  | NO   | PRI | NULL      | auto_increment    |
+| Visitor_ID    | int  | NO   | MUL | NULL      |                   |
+| date_of_visit | date | NO   |     | NULL      |                   |
+| booking_date  | date | NO   |     | curdate() | DEFAULT_GENERATED |
++---------------+------+------+-----+-----------+-------------------+
+4 rows in set (0.00 sec)
+
+mysql> ALTER TABLE ticket DROP FOREIGN KEY ticket_ibfk_1;
+ERROR 1091 (42000): Can't DROP 'ticket_ibfk_1'; check that column/key exists
+mysql> show create table ticket;
++--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table  | Create Table
+
+
+                       |
++--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ticket | CREATE TABLE `ticket` (
+  `Ticket_ID` int NOT NULL AUTO_INCREMENT,
+  `Visitor_ID` int NOT NULL,
+  `date_of_visit` date NOT NULL,
+  `booking_date` date NOT NULL DEFAULT (curdate()),
+  PRIMARY KEY (`Ticket_ID`),
+  KEY `Ticket` (`Visitor_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> ALTER TABLE `ticket` DROP INDEX `Ticket`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE ticket DROP Primary key;
+ERROR 1075 (42000): Incorrect table definition; there can be only one auto column and it must be defined as a key
+mysql> ALTER TABLE `login` MODIFY COLUMN `visitor_id` INT AUTO_INCREMENT PRIMARY KEY;
+ERROR 1054 (42S22): Unknown column 'visitor_id' in 'login'
+mysql> ALTER TABLE login MODIFY COLUMN visitor_id INT AUTO_INCREMENT PRIMARY KEY;
+ERROR 1054 (42S22): Unknown column 'visitor_id' in 'login'
+mysql> ALTER TABLE ticket MODIFY COLUMN visitor_id INT AUTO_INCREMENT PRIMARY KEY;
+ERROR 1075 (42000): Incorrect table definition; there can be only one auto column and it must be defined as a key
+mysql> ALTER TABLE `ticket` DROP PRIMARY KEY;
+ERROR 1075 (42000): Incorrect table definition; there can be only one auto column and it must be defined as a key
+mysql> ALTER TABLE ticket DROP COLUMN Ticket_ID;
+Query OK, 5 rows affected (0.03 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> desc ticket;
++---------------+------+------+-----+-----------+-------------------+
+| Field         | Type | Null | Key | Default   | Extra             |
++---------------+------+------+-----+-----------+-------------------+
+| Visitor_ID    | int  | NO   |     | NULL      |                   |
+| date_of_visit | date | NO   |     | NULL      |                   |
+| booking_date  | date | NO   |     | curdate() | DEFAULT_GENERATED |
++---------------+------+------+-----+-----------+-------------------+
+3 rows in set (0.00 sec)
+
+mysql> ALTER TABLE `ticket` ADD COLUMN `combined_id` INT AUTO_INCREMENT PRIMARY KEY FIRST;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE `ticket` ADD COLUMN `Ticket_ID` INT AFTER `combined_id`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc ticket;
++---------------+------+------+-----+-----------+-------------------+
+| Field         | Type | Null | Key | Default   | Extra             |
++---------------+------+------+-----+-----------+-------------------+
+| combined_id   | int  | NO   | PRI | NULL      | auto_increment    |
+| Ticket_ID     | int  | YES  |     | NULL      |                   |
+| Visitor_ID    | int  | NO   |     | NULL      |                   |
+| date_of_visit | date | NO   |     | NULL      |                   |
+| booking_date  | date | NO   |     | curdate() | DEFAULT_GENERATED |
++---------------+------+------+-----+-----------+-------------------+
+5 rows in set (0.00 sec)
+
+mysql> DELIMITER //
+mysql> CREATE TRIGGER before_insert_ticket
+    -> BEFORE INSERT ON `ticket`
+    -> FOR EACH ROW
+    -> SET NEW.Ticket_ID = NEW.combined_id,
+    ->     NEW.Visitor_ID = NEW.combined_id;
+    -> //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> DELIMITER ;
+mysql>
+mysql> desc ticket;
++---------------+------+------+-----+-----------+-------------------+
+| Field         | Type | Null | Key | Default   | Extra             |
++---------------+------+------+-----+-----------+-------------------+
+| combined_id   | int  | NO   | PRI | NULL      | auto_increment    |
+| Ticket_ID     | int  | YES  |     | NULL      |                   |
+| Visitor_ID    | int  | NO   |     | NULL      |                   |
+| date_of_visit | date | NO   |     | NULL      |                   |
+| booking_date  | date | NO   |     | curdate() | DEFAULT_GENERATED |
++---------------+------+------+-----+-----------+-------------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from ticket;
++-------------+-----------+------------+---------------+--------------+
+| combined_id | Ticket_ID | Visitor_ID | date_of_visit | booking_date |
++-------------+-----------+------------+---------------+--------------+
+|           1 |      NULL |          1 | 2023-11-10    | 2023-11-09   |
+|           2 |      NULL |          2 | 2023-11-11    | 2023-11-10   |
+|           3 |      NULL |          3 | 2023-11-12    | 2023-11-11   |
+|           4 |      NULL |          4 | 2023-11-13    | 2023-11-12   |
+|           5 |      NULL |          5 | 2023-11-14    | 2023-11-13   |
++-------------+-----------+------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> UPDATE `ticket` SET `Ticket_ID` = `combined_id`;
+Query OK, 5 rows affected (0.00 sec)
+Rows matched: 5  Changed: 5  Warnings: 0
+
+mysql>
+mysql> select * from ticket;
++-------------+-----------+------------+---------------+--------------+
+| combined_id | Ticket_ID | Visitor_ID | date_of_visit | booking_date |
++-------------+-----------+------------+---------------+--------------+
+|           1 |         1 |          1 | 2023-11-10    | 2023-11-09   |
+|           2 |         2 |          2 | 2023-11-11    | 2023-11-10   |
+|           3 |         3 |          3 | 2023-11-12    | 2023-11-11   |
+|           4 |         4 |          4 | 2023-11-13    | 2023-11-12   |
+|           5 |         5 |          5 | 2023-11-14    | 2023-11-13   |
++-------------+-----------+------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+mysql> show tables;
++----------------------+
+| Tables_in_agms       |
++----------------------+
+| artwork              |
+| artwork_log          |
+| artwork_view         |
+| guide                |
+| guided_tour          |
+| login                |
+| review               |
+| ticket               |
+| visitor_log          |
+| visitor_tag          |
+| visitor_transactions |
++----------------------+
+11 rows in set (0.00 sec)
+
+mysql> desc visitor_log
+    -> ;
++------------+-----------+------+-----+---------+----------------+
+| Field      | Type      | Null | Key | Default | Extra          |
++------------+-----------+------+-----+---------+----------------+
+| Log_ID     | int       | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID | int       | YES  | MUL | NULL    |                |
+| entry_time | timestamp | NO   |     | NULL    |                |
+| exit_time  | timestamp | NO   |     | NULL    |                |
++------------+-----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> show create table visitor_log;
++-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table       | Create Table
+
+
+                   |
++-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| visitor_log | CREATE TABLE `visitor_log` (
+  `Log_ID` int NOT NULL AUTO_INCREMENT,
+  `Visitor_ID` int DEFAULT NULL,
+  `entry_time` timestamp NOT NULL,
+  `exit_time` timestamp NOT NULL,
+  PRIMARY KEY (`Log_ID`),
+  KEY `Visitor_ID` (`Visitor_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> -- Drop the existing index
+mysql> ALTER TABLE `visitor_log` DROP INDEX `Visitor_ID`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Add a foreign key referencing ticket('Visitor_ID')
+mysql> ALTER TABLE `visitor_log`
+    -> ADD CONSTRAINT `fk_visitor_log_ticket`
+    -> FOREIGN KEY (`Visitor_ID`)
+    -> REFERENCES `ticket`(`Visitor_ID`);
+ERROR 1822 (HY000): Failed to add the foreign key constraint. Missing index for constraint 'fk_visitor_log_ticket' in the referenced table 'ticket'
+mysql>
+mysql>
+mysql> ALTER TABLE `visitor_tag` DROP INDEX `Visitor_ID`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE `review` DROP INDEX `Visitor_ID`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE `artwork_view` DROP INDEX `Visitor_ID`;
+ERROR 1091 (42000): Can't DROP 'Visitor_ID'; check that column/key exists
+mysql> show create table artwork_view;
++--------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table        | Create Table
+
+
+                                    |
++--------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| artwork_view | CREATE TABLE `artwork_view` (
+  `Visitor_ID` int NOT NULL,
+  `Artwork_ID` int NOT NULL,
+  PRIMARY KEY (`Visitor_ID`,`Artwork_ID`),
+  KEY `Artwork_ID` (`Artwork_ID`),
+  CONSTRAINT `artwork_view_ibfk_2` FOREIGN KEY (`Artwork_ID`) REFERENCES `artwork` (`Artwork_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++--------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> ALTER TABLE `artwork_log` DROP INDEX `Visitor_ID`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE `visitor_transactions` DROP INDEX `Visitor_ID`;
+ERROR 1091 (42000): Can't DROP 'Visitor_ID'; check that column/key exists
+mysql> show create table visitor_transactions;
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table                | Create Table
+
+
+                                                              |
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| visitor_transactions | CREATE TABLE `visitor_transactions` (
+  `Trans_ID` int NOT NULL AUTO_INCREMENT,
+  `Booking_Visitor_ID` int NOT NULL,
+  `No_of_Tickets` int NOT NULL,
+  `Time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`Trans_ID`),
+  KEY `Booking_Visitor_ID` (`Booking_Visitor_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++----------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> ALTER TABLE `visitor_transactions` DROP INDEX `Booking_Visitor_ID`;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ^C
+mysql> ALTER TABLE `visitor_tag`
+    -> ADD CONSTRAINT `fk_visitor_tag_ticket`
+    -> FOREIGN KEY (`combined_id`)
+    -> REFERENCES `ticket`(`combined_id`);
+ERROR 1072 (42000): Key column 'combined_id' doesn't exist in table
+mysql> desc visitor_log;
++------------+-----------+------+-----+---------+----------------+
+| Field      | Type      | Null | Key | Default | Extra          |
++------------+-----------+------+-----+---------+----------------+
+| Log_ID     | int       | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID | int       | YES  |     | NULL    |                |
+| entry_time | timestamp | NO   |     | NULL    |                |
+| exit_time  | timestamp | NO   |     | NULL    |                |
++------------+-----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql>
+mysql> desc login;
++--------------+-------------------------+------+-----+---------+-------+
+| Field        | Type                    | Null | Key | Default | Extra |
++--------------+-------------------------+------+-----+---------+-------+
+| username     | varchar(25)             | NO   | PRI | NULL    |       |
+| password     | varchar(25)             | NO   |     | NULL    |       |
+| type         | enum('Admin','Visitor') | NO   |     | NULL    |       |
+| user_id      | int                     | YES  |     | NULL    |       |
+| Name         | varchar(40)             | NO   |     | NULL    |       |
+| email_id     | varchar(40)             | YES  |     | NULL    |       |
+| phone_number | varchar(10)             | NO   |     | NULL    |       |
++--------------+-------------------------+------+-----+---------+-------+
+7 rows in set (0.00 sec)
+
+mysql> show tables;
++----------------------+
+| Tables_in_agms       |
++----------------------+
+| artwork              |
+| artwork_log          |
+| artwork_view         |
+| guide                |
+| guided_tour          |
+| login                |
+| review               |
+| ticket               |
+| visitor_log          |
+| visitor_tag          |
+| visitor_transactions |
++----------------------+
+11 rows in set (0.00 sec)
+
+mysql> desc artwork;
++----------------+---------------------------------------------------------------------+------+-----+---------+----------------+
+| Field          | Type                                                                | Null | Key | Default | Extra          |
++----------------+---------------------------------------------------------------------+------+-----+---------+----------------+
+| Artwork_ID     | int                                                                 | NO   | PRI | NULL    | auto_increment |
+| Title          | varchar(30)                                                         | NO   |     | NULL    |                |
+| Artist         | varchar(30)                                                         | NO   |     | NULL    |                |
+| description    | varchar(1000)                                                       | YES  |     | NULL    |                |
+| Published_date | date                                                                | NO   |     | NULL    |                |
+| Type           | enum('Painting','Sculpture','Illustration','Figurine','Photograph') | NO   |     | NULL    |                |
+| img_loc        | varchar(500)                                                        | NO   |     | NULL    |                |
++----------------+---------------------------------------------------------------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)
+
+mysql> desc artwork_log;
++------------+-------------+------+-----+---------+----------------+
+| Field      | Type        | Null | Key | Default | Extra          |
++------------+-------------+------+-----+---------+----------------+
+| Log_ID     | int         | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID | int         | NO   |     | NULL    |                |
+| Type       | varchar(25) | NO   |     | NULL    |                |
+| Time       | timestamp   | YES  |     | NULL    |                |
++------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc guide;
++--------------+---------------------------+------+-----+---------+----------------+
+| Field        | Type                      | Null | Key | Default | Extra          |
++--------------+---------------------------+------+-----+---------+----------------+
+| Guide_ID     | int                       | NO   | PRI | NULL    | auto_increment |
+| Name         | varchar(20)               | NO   |     | NULL    |                |
+| Phone_number | varchar(10)               | NO   |     | NULL    |                |
+| rating       | enum('1','2','3','4','5') | YES  |     | NULL    |                |
++--------------+---------------------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc guided_tour;
++--------------+---------------------------+------+-----+-------------------+-------------------+
+| Field        | Type                      | Null | Key | Default           | Extra             |
++--------------+---------------------------+------+-----+-------------------+-------------------+
+| Tour_ID      | int                       | NO   | PRI | NULL              | auto_increment    |
+| Guide_ID     | int                       | NO   | MUL | NULL              |                   |
+| booking_time | timestamp                 | NO   |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| tour_date    | date                      | NO   |     | NULL              |                   |
+| slot         | enum('1','2','3','4','5') | NO   |     | NULL              |                   |
++--------------+---------------------------+------+-----+-------------------+-------------------+
+5 rows in set (0.00 sec)
+
+mysql> desc visitor_log;
++------------+-----------+------+-----+---------+----------------+
+| Field      | Type      | Null | Key | Default | Extra          |
++------------+-----------+------+-----+---------+----------------+
+| Log_ID     | int       | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID | int       | YES  |     | NULL    |                |
+| entry_time | timestamp | NO   |     | NULL    |                |
+| exit_time  | timestamp | NO   |     | NULL    |                |
++------------+-----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc visitor_tag;
++---------------+------+------+-----+---------+----------------+
+| Field         | Type | Null | Key | Default | Extra          |
++---------------+------+------+-----+---------+----------------+
+| Tag_ID        | int  | NO   | PRI | NULL    | auto_increment |
+| Visitor_ID    | int  | YES  |     | NULL    |                |
+| Assigned_Date | date | NO   |     | NULL    |                |
++---------------+------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> desc visitor_transactions;
++--------------------+-----------+------+-----+---------+----------------+
+| Field              | Type      | Null | Key | Default | Extra          |
++--------------------+-----------+------+-----+---------+----------------+
+| Trans_ID           | int       | NO   | PRI | NULL    | auto_increment |
+| Booking_Visitor_ID | int       | NO   |     | NULL    |                |
+| No_of_Tickets      | int       | NO   |     | NULL    |                |
+| Time               | timestamp | YES  |     | NULL    |                |
++--------------------+-----------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc ticket;
++---------------+------+------+-----+-----------+-------------------+
+| Field         | Type | Null | Key | Default   | Extra             |
++---------------+------+------+-----+-----------+-------------------+
+| combined_id   | int  | NO   | PRI | NULL      | auto_increment    |
+| Ticket_ID     | int  | YES  |     | NULL      |                   |
+| Visitor_ID    | int  | NO   |     | NULL      |                   |
+| date_of_visit | date | NO   |     | NULL      |                   |
+| booking_date  | date | NO   |     | curdate() | DEFAULT_GENERATED |
++---------------+------+------+-----+-----------+-------------------+
+5 rows in set (0.00 sec)
+
+mysql> desc login;
++--------------+-------------------------+------+-----+---------+-------+
+| Field        | Type                    | Null | Key | Default | Extra |
++--------------+-------------------------+------+-----+---------+-------+
+| username     | varchar(25)             | NO   | PRI | NULL    |       |
+| password     | varchar(25)             | NO   |     | NULL    |       |
+| type         | enum('Admin','Visitor') | NO   |     | NULL    |       |
+| user_id      | int                     | YES  |     | NULL    |       |
+| Name         | varchar(40)             | NO   |     | NULL    |       |
+| email_id     | varchar(40)             | YES  |     | NULL    |       |
+| phone_number | varchar(10)             | NO   |     | NULL    |       |
++--------------+-------------------------+------+-----+---------+-------+
+7 rows in set (0.00 sec)
+
+mysql>
+
+
+mysql> desc login;
++--------------+-------------------------+------+-----+---------+-------+
+| Field        | Type                    | Null | Key | Default | Extra |
++--------------+-------------------------+------+-----+---------+-------+
+| username     | varchar(25)             | NO   | PRI | NULL    |       |
+| password     | varchar(25)             | NO   |     | NULL    |       |
+| type         | enum('Admin','Visitor') | NO   |     | NULL    |       |
+| user_id      | int                     | YES  |     | NULL    |       |
+| Name         | varchar(40)             | NO   |     | NULL    |       |
+| email_id     | varchar(40)             | YES  |     | NULL    |       |
+| phone_number | varchar(10)             | NO   |     | NULL    |       |
++--------------+-------------------------+------+-----+---------+-------+
