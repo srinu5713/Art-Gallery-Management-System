@@ -8,6 +8,7 @@ from streamlit_extras.switch_page_button import switch_page
 
 st.session_state.isAdmin = 0
 st.session_state.isVisitor=0
+st.session_state.username=''
 
 st.header("Login")
 
@@ -24,6 +25,7 @@ if st.button("Login"):
             user = cursor.fetchone()
             if user and user['password'] == password:
                 if user['type'] == 'Visitor':
+                    st.session_state.username=username
                     st.success("Login successful! Redirecting to Visitor dashboard...")
                     st.session_state.isVisitor = 1
                     print(st.session_state.isVisitor)

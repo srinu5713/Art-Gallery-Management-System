@@ -21,7 +21,7 @@ if 'isAdmin' not in st.session_state:
 
 if st.session_state.isAdmin:
 
-    UPLOAD_FOLDER = 'C:/Users/HP/Documents/Academic Stuff/5th SEM/SE/Project AGMS/'
+    UPLOAD_FOLDER = 'F:/PES/B_Tech (Sem_5)/Software Engineering/Mini Project/Main'
     # dict1={1:"483px-Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",2:"the starry night.jpg",3:"thinker.jpg",4:"Saurashtra.jpg",5:"Indian Heritage.jpg"}
     # print(dict1)
 
@@ -52,10 +52,10 @@ if st.session_state.isAdmin:
         cur_date=datetime.date.today()
         if selected_date<=cur_date:
             if st.button('Show Stats'):
-                conn = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms')
+                conn = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms2')
                 cur = conn.cursor()
 
-                visitors_query = "SELECT COUNT(DISTINCT v.Visitor_ID) as num_visitors FROM visitor v JOIN ticket t ON v.Ticket_ID = t.Ticket_ID WHERE t.date_of_visit = %s"
+                visitors_query = "SELECT COUNT(DISTINCT Ticket_ID) FROM ticket WHERE date_of_visit = %s"
                 artworks_query = "SELECT COUNT(*) FROM artwork"
                 comments_query = "SELECT COUNT(*) FROM review WHERE DATE(review_date) = %s"
                 guides_query = "SELECT COUNT(*) FROM guide"
@@ -148,18 +148,18 @@ if st.session_state.isAdmin:
         s1 = st.date_input("Enter the date:")
         if st.button("Search"):
             conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms')
+                host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
             query1 = 'SELECT CURRENT_DATE()'
             cur.execute(query1)
             list1 = cur.fetchone()
             if s1 <= list1[0]:
-                query = "SELECT vl.log_id,vt.tag_id,vl.visitor_id,vl.entry_time,vl.exit_time FROM visitor_log vl JOIN visitor_tag vt ON vl.visitor_id=vt.visitor_id WHERE vt.assigned_date=%s"
+                query = "SELECT vtr.trans_id,vt.tag_id,vt.ticket_id,vt.entry_time,vt.exit_time FROM visitor_transaction vtr JOIN visitor_tag vt ON vtr.ticket_id=vt.ticket_id WHERE vt.assigned_date=%s"
                 cur.execute(query, (s1,))
                 list1 = cur.fetchall()
                 df1 = pd.DataFrame(
-                    list1, columns=['Log ID', 'Tag ID', 'Visitor ID', 'Entry time', 'Exit time'])
+                    list1, columns=['Log ID', 'Tag ID', 'Ticket ID', 'Entry time', 'Exit time'])
                 st.header("Log Transactions")
                 st.write(df1)
 
@@ -192,7 +192,7 @@ if st.session_state.isAdmin:
             col1, col2 = st.columns(2)
 
             conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms')
+                host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
             if search_option == "All":
@@ -378,7 +378,7 @@ if st.session_state.isAdmin:
 
                         # Insert data into the database
                         conn = mysql.connector.connect(
-                            host='localhost', username='root', password='wasd', database='agms')
+                            host='localhost', username='root', password='wasd', database='agms2')
                         cur = conn.cursor()
 
                         query = "INSERT INTO Artwork(Title, Artist, description, published_date, type, img_loc) VALUES(%s, %s, %s, %s, %s, %s)"
@@ -403,11 +403,20 @@ if st.session_state.isAdmin:
 
         elif option == 'Delete Artwork':
             try:
-                s1 = st.number_input("Artwork ID: ", step=1, value=1)
+                conn = mysql.connector.connect(
+                host='localhost', username='root', password='wasd', database='agms2')
+                cur = conn.cursor()
+                cur.execute("SELECT MAX(artwork_id) FROM artwork")
+                x=cur.fetchone()
+                conn.close()
+                y=x[0]+1
+                aid = range(21, y, 1)
+                
+                s1 = st.selectbox("Select Artwork ID to delete: ",aid, index=21)
                 if st.button("Delete"):
                     if s1:
                         conn = mysql.connector.connect(
-                            host='localhost', username='root', password='wasd', database='agms')
+                            host='localhost', username='root', password='wasd', database='agms2')
                         cur = conn.cursor()
 
                         query = "DELETE FROM Artwork WHERE Artwork_ID=%s"
@@ -420,12 +429,20 @@ if st.session_state.isAdmin:
                 st.error("Please Enter valid value")
 
     def do_view_guide():
-        s1 = st.number_input("Enter Guide ID: ", step=1, value=1)
+        conn = mysql.connector.connect(
+                host='localhost', username='root', password='wasd', database='agms2')
+        cur = conn.cursor()
+        cur.execute("SELECT MAX(guide_id) FROM guide")
+        x=cur.fetchone()
+        conn.close()
+        y=x[0]+1
+        gid = range(0, y, 1)
+        s1 = st.selectbox("Select Guide ID to search (Select 0 to view all Guides details): ",gid, index=0)
         s2 = st.text_input("Enter Guide Name: ")
 
         if st.button("Search"):
             conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms')
+                host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
             query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
@@ -462,45 +479,74 @@ if st.session_state.isAdmin:
             conn.close()
 
     def do_add_del_guide():
-        s1 = st.number_input("Enter Guide ID: ", step=1, value=1)
+        option = st.selectbox('Select the operation:',
+                              ('Add Guide', 'Delete Guide'))
+        if option=="Add Guide":
+            conn = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms2')
+            cur = conn.cursor()
+            name=st.text_input("Enter Guide Name: ")
+            phno=st.text_input("Enter Phone Number: ")
+            if st.button("Add"):
+                if len(phno)==10:
+                    try:
+                        cur.execute("INSERT INTO guide(Name,Phone_number) VALUES (%s,%s)",(name,phno))
+                        conn.commit()
 
-        if st.button("Search"):
-            if s1:
-                conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms')
-                cur = conn.cursor()
+                    except Exception as e:
+                        st.error(f"An error occurred: {e}")
 
-                query = '''DELETE FROM guide WHERE Guide_ID = %s'''
-                cur.execute(query, (s1,))
-                list1 = cur.fetchall()
-                df1 = pd.DataFrame(
-                    list1, columns=['Guide ID', 'Name', 'Phone Number', 'Rating'])
-                st.header("View Guides")
-                st.write(df1)
-
-            else:
-                st.error("Please enter the guide ID...")
-
+                else:
+                    st.error("Invalid Phone Number")
             conn.close()
+
+    
+        else:
+            conn = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms2')
+            cur = conn.cursor()
+            cur.execute("SELECT MAX(guide_id) FROM guide")
+            x=cur.fetchone()
+            conn.close()
+            y=x[0]+1
+            gid = range(1, y, 1)
+            s1 = st.selectbox("Enter Guide ID: ",gid, index=1)
+
+            if st.button("Delete"):
+                if s1:
+                    conn = mysql.connector.connect(
+                        host='localhost', username='root', password='wasd', database='agms2')
+                    cur = conn.cursor()
+
+                    query = '''DELETE FROM guide WHERE Guide_ID = %s'''
+                    cur.execute(query, (s1,))
+                    conn.close()
+                    list1 = cur.fetchall()
+                    df1 = pd.DataFrame(
+                        list1, columns=['Guide ID', 'Name', 'Phone Number', 'Rating'])
+                    st.header("View Guides")
+                    st.write(df1)
+
+                else:
+                    st.error("Please enter the guide ID...")
+
 
     def do_ticket_book():
         s1 = st.date_input("From Booking Date: ")
-        formatted_start_date = s1.strftime('%Y-%m-%d')
+        s1 = s1.strftime('%Y-%m-%d')
         s2 = st.date_input("To Booking date: ")
-        formatted_start_date = s2.strftime('%Y-%m-%d')
+        s2 = s2.strftime('%Y-%m-%d')
 
         x = st.button("Search")
 
         if x:
             if s1 and s2 and s2 >= s1:
                 conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms')
+                    host='localhost', username='root', password='wasd', database='agms2')
                 cur = conn.cursor()
 
                 query = '''
                 SELECT v.trans_ID, v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100 * v.no_of_tickets AS amount 
                 FROM visitor_transactions v 
-                JOIN ticket t ON v.booking_visitor_id = t.Visitor_ID
+                JOIN ticket t ON v.ticket_id = t.ticket_ID
                 WHERE DATE(v.time) BETWEEN %s AND %s
                 '''
                 query1 = 'SELECT CURRENT_DATE()'
@@ -520,7 +566,7 @@ if st.session_state.isAdmin:
                 st.error("Enter valid From to dates")
 
             # elif s1:
-            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms')
+            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms2')
             #     cur = conn.cursor()
 
             #     query='''SELECT v.trans_ID,v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100*(v.no_of_tickets) AS amount
@@ -532,7 +578,7 @@ if st.session_state.isAdmin:
             #     st.write(df1)
 
             # elif s2:
-            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms')
+            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms2')
             #     cur = conn.cursor()
 
             #     query='''SELECT v.trans_ID,v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100*(v.no_of_tickets) AS amount
@@ -544,7 +590,7 @@ if st.session_state.isAdmin:
             #     st.write(df1)
 
             # else:
-            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms')
+            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms2')
             #     cur = conn.cursor()
 
             #     query='''SELECT v.trans_ID,v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100*(v.no_of_tickets) AS amount
@@ -566,14 +612,14 @@ if st.session_state.isAdmin:
         elif search_criteria == 'Tour Date':
             s1 = None
             s2 = st.date_input("Tour_date: ")
-            formatted_start_date = s2.strftime('%Y-%m-%d')
+            s2 = s2.strftime('%Y-%m-%d')
 
         x = st.button("Search")
 
         if x:
             if s1:
                 conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms')
+                    host='localhost', username='root', password='wasd', database='agms2')
                 cur = conn.cursor()
 
                 query = '''SELECT guide_id,tour_id, tour_date FROM guided_tour WHERE guide_id=%s'''
@@ -586,7 +632,7 @@ if st.session_state.isAdmin:
 
             elif s2:
                 conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms')
+                    host='localhost', username='root', password='wasd', database='agms2')
                 cur = conn.cursor()
 
                 query1 = 'SELECT CURRENT_DATE()'
@@ -609,7 +655,7 @@ if st.session_state.isAdmin:
         option = st.selectbox("Ratings", ('5', '4', '3', '2', '1'))
         if st.button("Search"):
             conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms')
+                host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
             query = '''SELECT artwork_id,visitor_id,rating,comment FROM review WHERE rating=%s AND review_date> (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) ORDER BY review_date DESC'''
@@ -626,7 +672,7 @@ if st.session_state.isAdmin:
         option = st.selectbox("Ratings", ('5', '4', '3', '2', '1'))
         if st.button("Search"):
             conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms')
+                host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
             query = '''SELECT artwork_id, visitor_id, rating, comment 
@@ -644,7 +690,7 @@ if st.session_state.isAdmin:
 
     def do_logout():
         st.markdown("### Logout")
-        st.warning('Are you sure, you want to logout?', icon="⚠️")
+        st.warning('Are you sure, you want to logout?', icon="⚠")
         if st.button("Yes", key="logout_yes_button"):
             st.markdown("###Logout successfully")
             switch_page('login')
