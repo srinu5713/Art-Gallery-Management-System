@@ -40,9 +40,4 @@ if st.button("Login"):
         
     finally:
         connection.close()
-# Logout button
-if st.button("Register"):
-    # Clear the user_id and switch back to the login page
-    st.session_state.user_id = None
-    switch_page("Register")
 

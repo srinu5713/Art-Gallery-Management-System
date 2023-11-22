@@ -8,6 +8,7 @@ from IPython.display import display
 from streamlit_extras.switch_page_button import switch_page
 import os
 import datetime
+import re
  
 
 st.set_page_config(page_title='Admin Dashboard', layout='wide')
@@ -593,24 +594,48 @@ if st.session_state.isAdmin:
         try:
             mean_values = monthly_df.mean()
 
-            # Display the results
-            st.write("Mean values:")
-            st.write(mean_values)
-
             # Rank the paintings based on their mean values
             painting_ranks = mean_values.rank(ascending=False)
             st.write("\nRanking of paintings based on mean values:")
             st.write(painting_ranks)
-            painting_ranks = mean_values.rank()
-            st.write("\nRanking of paintings based on mean values:")
-            st.write(painting_ranks)
-        except :
-            st.error("No fle uploaded")
+
+
+            #Update table 
+            conn = mysql.connector.connect(
+                host='localhost', 
+                username='root', 
+                password='wasd', 
+                database='agms2')
+            cur = conn.cursor()
+            for column in painting_ranks.index:
+                artwork_id = re.search(r'\d+$', column).group()  # Extract last digits
+                query = f"UPDATE artwork SET ranking = {int(painting_ranks[column])} WHERE artwork_ID = {artwork_id}"
+                cur.execute(query)
+            conn.commit()
+            conn.close()
+
+
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
 
     def view_ranking():
-        pass
+        try:
+            conn = mysql.connector.connect(
+                    host='localhost', 
+                    username='root', 
+                    password='wasd', 
+                    database='agms2')
+            cur = conn.cursor()
+            q1='SELECT artwork_id,Title,Artist,Ranking FROM ARTWORK ORDER BY Ranking'
+            cur.execute(q1)
+            tab=cur.fetchall()
+            rank=pd.DataFrame(tab,columns=['Artwork ID','Artwork Title','Artist','Ranking'])
+            st.header("Current Ranking")
+            st.table(rank)
+            conn.close()
 
-
+        except Exception as e:
+            st.error(f"An error occurred: {e}")        
 
 
     def do_latest_rev():
