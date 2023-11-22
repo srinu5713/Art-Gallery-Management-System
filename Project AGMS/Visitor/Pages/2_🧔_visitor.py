@@ -55,8 +55,6 @@ if st.session_state.isVisitor:
             st.markdown("###Logout successfully")
             switch_page('login')
 
-        elif st.button("No", key="logout_no_button"):
-            st.markdown("### Continue")
 
     styles = {
         "container": {"margin": "0px !important", "padding": "0!important", "align-items": "stretch", "background-color": "#03dffc"},

@@ -13,9 +13,8 @@ def do_logs(username):
     connection = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms2')
     cursor = connection.cursor()
 
-    cursor.execute('SELECT DISTINCT Artwork_ID FROM review')
+    cursor.execute('SELECT DISTINCT Artwork_ID FROM Artwork')
     artwork_ids = [str(row[0]) for row in cursor.fetchall()]
-    # Dropdown to select artwork ID
     selected_artwork_id = st.selectbox("Select the artwork ID to review:", artwork_ids)
 
     # Input for review comment
@@ -27,15 +26,18 @@ def do_logs(username):
     # Button to submit the review
     if st.button("Submit Review"):
         review_date = datetime.now().strftime("%Y-%m-%d")  
-        try:                
-            insert_query = "INSERT INTO review (Artwork_ID, username, rating, comment, Review_date) VALUES (%s, %s, %s, %s, %s)"
-            cursor.execute(insert_query, (selected_artwork_id, username, rating, review_comment, review_date))
-            
-            connection.commit()
-            st.success("Review submitted successfully!")
+        if review_comment and rating:
+            try:                
+                insert_query = "INSERT INTO review (Artwork_ID, username, rating, comment, Review_date) VALUES (%s, %s, %s, %s, %s)"
+                cursor.execute(insert_query, (selected_artwork_id, username, rating, review_comment, review_date))
+                
+                connection.commit()
+                st.success("Review submitted successfully!")
 
-        except mysql.connector.Error as e:
-            st.error(f"Error: {e}")
+            except mysql.connector.Error as e:
+                st.error(f"Error: {e}")
 
-        finally:
-            connection.close()
+            finally:
+                connection.close()
+        else:
+            st.warning("Fill all the necessary fields")

@@ -13,8 +13,9 @@ from datetime import datetime  # Updated import statement
 def do_view_artw():
     st.markdown("### View Artworks")
 
-    search_option = st.radio(
-        "Search by:", ["All", "Published Year", "Type", "Both"])
+    options = ["All", "Published Year", "Type", "Published year and Type","Popularity","New Paintings"]
+
+    search_option = st.selectbox("Search by:",options)
 
     if search_option == "Published Year":
         years = range(2023, 1969,-1)  # Change the range based on your data
@@ -25,7 +26,7 @@ def do_view_artw():
         option = st.selectbox('Select Type of Artwork:', ('Painting',
                                 'Sculpture', 'Illustration', 'Figurine', 'Photograph'))
 
-    elif search_option == "Both":
+    elif search_option == "Published year and Type":
         years = range(1970, 2024)  # Change the range based on your data
         yr = st.selectbox("Select Published Year:",
                             years, index=len(years)-1)
@@ -46,11 +47,11 @@ def do_view_artw():
             list1 = cur.fetchall()
 
             for i in range(len(list1)):
-                if i % 2 != 0:
+                if i % 2 == 0:
                     original = Image.open(list1[i][6])
-                    col1.header("Image "+str(i))
+                    col1.header("Image "+str(i+1))
                     col1.image(original, use_column_width=True)
-                    col1.markdown(f'''`
+                    col1.markdown(f'''
                             1. Artwork ID: {list1[i][0]}
                             2. Title: {list1[i][1]}
                             3. Artist Name: {list1[i][2]}
@@ -60,7 +61,7 @@ def do_view_artw():
                             ''')
                 else:
                     original1 = Image.open(list1[i][6])
-                    col2.header("Image "+str(i))
+                    col2.header("Image "+str(i+1))
                     col2.image(original1, use_column_width=True)
                     col2.markdown(f'''
                             1. Artwork ID: {list1[i][0]}
@@ -84,7 +85,7 @@ def do_view_artw():
                         # print(f"artwork ID and url: {dict1}")
                         if i % 2 == 0:
                             original = Image.open(list1[i][6])
-                            col1.header("Image "+str(i))
+                            col1.header("Image "+str(i+1))
                             col1.image(original, use_column_width=True)
                             col1.markdown(f'''
                                 1. Artwork ID: {list1[i][0]}
@@ -96,7 +97,7 @@ def do_view_artw():
                                 ''')
                         else:
                             original1 = Image.open(list1[i][6])
-                            col2.header("Image "+str(i))
+                            col2.header("Image "+str(i+1))
                             col2.image(original1, use_column_width=True)
                             col2.markdown(f'''
                                 1. Artwork ID: {list1[i][0]}
@@ -123,7 +124,7 @@ def do_view_artw():
                     # print(f"artwork ID and url: {dict1}")
                     if i % 2 == 0:
                         original = Image.open(list1[i][6])
-                        col1.header("Image "+str(i))
+                        col1.header("Image "+str(i+1))
                         col1.image(original, use_column_width=True)
                         col1.markdown(f'''
                             1. Artwork ID: {list1[i][0]}
@@ -135,7 +136,7 @@ def do_view_artw():
                             ''')
                     else:
                         original1 = Image.open(list1[i][6])
-                        col2.header("Image "+str(i))
+                        col2.header("Image "+str(i+1))
                         col2.image(original1, use_column_width=True)
                         col2.markdown(f'''
                             1. Artwork ID: {list1[i][0]}
@@ -150,38 +151,86 @@ def do_view_artw():
             except:
                 st.warning("No Artwork of this Type published")
 
-        elif search_option == "Both":
+        elif search_option == "Published year and Type":
             query = "SELECT * FROM Artwork WHERE published_date LIKE %s and type=%s"
             try:
                 cur.execute(query, (f"%{yr}%", option))
                 list1 = cur.fetchall()
-
-                for i in range(len(list1)):
-                    if i % 2 == 0:
-                        original = Image.open(list1[i][6])
-                        col1.header("Image "+str(i))
-                        col1.image(original, use_column_width=True)
-                        col1.markdown(f'''
-                            1. Artwork ID: {list1[i][0]}
-                            2. Title: {list1[i][1]}
-                            3. Artist Name: {list1[i][2]}
-                            4. Description: {list1[i][3]}
-                            5. Published Year: {list1[i][4]}
-                            6. Type: {list1[i][5]}
-                            ''')
-                    else:
-                        original1 = Image.open(list1[i][6])
-                        col2.header("Image "+str(i))
-                        col2.image(original1, use_column_width=True)
-                        col2.markdown(f'''
-                            1. Artwork ID: {list1[i][0]}
-                            2. Title: {list1[i][1]}
-                            3. Artist Name: {list1[i][2]}
-                            4. Description: {list1[i][3]}
-                            5. Published Year: {list1[i][4]}
-                            6. Type: {list1[i][5]}
-                            ''')
-                return
+                if list1:
+                    for i in range(len(list1)):
+                        if i % 2 == 0:
+                            original = Image.open(list1[i][6])
+                            col1.header("Image "+str(i+1))
+                            col1.image(original, use_column_width=True)
+                            col1.markdown(f'''
+                                1. Artwork ID: {list1[i][0]}
+                                2. Title: {list1[i][1]}
+                                3. Artist Name: {list1[i][2]}
+                                4. Description: {list1[i][3]}
+                                5. Published Year: {list1[i][4]}
+                                6. Type: {list1[i][5]}
+                                ''')
+                        else:
+                            original1 = Image.open(list1[i][6])
+                            col2.header("Image "+str(i+1))
+                            col2.image(original1, use_column_width=True)
+                            col2.markdown(f'''
+                                1. Artwork ID: {list1[i][0]}
+                                2. Title: {list1[i][1]}
+                                3. Artist Name: {list1[i][2]}
+                                4. Description: {list1[i][3]}
+                                5. Published Year: {list1[i][4]}
+                                6. Type: {list1[i][5]}
+                                ''')
+                    return
+                else:
+                    st.warning("No Artwork of this Type published in this year")
             except:
                 st.warning(
                     "No Artwork of this Type published in this year")
+        elif search_option == "Popularity":
+            query = "SELECT * FROM Artwork ORDER BY ranking"
+            try:
+                cur.execute(query)
+                list1 = cur.fetchall()
+                for i in range(len(list1)):
+                    if list1[i][7] > 0:
+                        original = Image.open(list1[i][6])
+                        col1.header(f"Rank {list1[i][7]}")
+                        col1.image(original, use_column_width=True)
+                        col1.markdown(f'''
+                                1. Artwork ID: {list1[i][0]}
+                                2. Title: {list1[i][1]}
+                                3. Artist Name: {list1[i][2]}
+                                4. Description: {list1[i][3]}
+                                5. Published Year: {list1[i][4]}
+                                6. Type: {list1[i][5]}
+                                ''')
+                return
+            except:
+                st.warning("Internal Issue")
+        
+        elif search_option == "New Paintings":
+            query = "SELECT * FROM Artwork where Ranking=0"
+            try:
+                cur.execute(query)
+                list1 = cur.fetchall()
+                if list1:
+                    for i in range(len(list1)):
+                        if list1[i][7] == 0:
+                            original = Image.open(list1[i][6])
+                            col1.header("Image "+str(i+1))
+                            col1.image(original, use_column_width=True)
+                            col1.markdown(f'''
+                                    1. Artwork ID: {list1[i][0]}
+                                    2. Title: {list1[i][1]}
+                                    3. Artist Name: {list1[i][2]}
+                                    4. Description: {list1[i][3]}
+                                    5. Published Year: {list1[i][4]}
+                                    6. Type: {list1[i][5]}
+                                    ''')
+                    return
+                else :
+                    st.warning("No new Artworks are Present")
+            except:
+                st.warning("Internal Issue")

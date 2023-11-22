@@ -36,6 +36,7 @@ if st.session_state.isAdmin:
                 comments_query = "SELECT COUNT(*) FROM review WHERE DATE(review_date) = %s"
                 guides_query = "SELECT COUNT(*) FROM guide"
                 tickets_query = "SELECT SUM(No_of_Tickets) FROM visitor_transactions WHERE DATE(Time) = %s"
+                
 
                 try:
                     cur.execute(visitors_query, (selected_date,))
@@ -58,6 +59,8 @@ if st.session_state.isAdmin:
                     result = cur.fetchone()
                     no_of_tickets = int(result[0]) if result and result[0] is not None else 0
 
+
+
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.metric("Visitors", num_visitors, delta="Daily", help="Number of visitors")
@@ -66,11 +69,14 @@ if st.session_state.isAdmin:
                     with col3:
                         st.metric("Comments", num_comments, delta="Daily", help="Number of comments")
 
-                    col4, col5 = st.columns(2)
+                    col4, col5,col6 = st.columns(3)
                     with col4:
                         st.metric("Guides", num_guides, delta="Daily", help="Number of guides")
                     with col5:
-                        st.metric("No of Tickets Sold", no_of_tickets, delta="Daily", help="Amount earned")
+                        st.metric("No of Tickets Sold", no_of_tickets, delta="Daily", help="No of tickets sold today")
+                    with col6:
+                        st.metric("Today's Revenue", (no_of_tickets*150), delta="Daily", help="Amount earned Today")
+                    
 
                 except Exception as e:
                     st.error(f"An error occurred: {e}")
@@ -287,33 +293,35 @@ if st.session_state.isAdmin:
                 try:
                     cur.execute(query, (f"%{yr}%", option))
                     list1 = cur.fetchall()
-
-                    for i in range(len(list1)):
-                        if i % 2 == 0:
-                            original = Image.open(list1[i][6])
-                            col1.header("Image "+str(i))
-                            col1.image(original, use_column_width=True)
-                            col1.markdown(f'''
-                                1. Artwork ID: {list1[i][0]}
-                                2. Title: {list1[i][1]}
-                                3. Artist Name: {list1[i][2]}
-                                4. Description: {list1[i][3]}
-                                5. Published Year: {list1[i][4]}
-                                6. Type: {list1[i][5]}
-                                ''')
-                        else:
-                            original1 = Image.open(list1[i][6])
-                            col2.header("Image "+str(i))
-                            col2.image(original1, use_column_width=True)
-                            col2.markdown(f'''
-                                1. Artwork ID: {list1[i][0]}
-                                2. Title: {list1[i][1]}
-                                3. Artist Name: {list1[i][2]}
-                                4. Description: {list1[i][3]}
-                                5. Published Year: {list1[i][4]}
-                                6. Type: {list1[i][5]}
-                                ''')
-                    return
+                    if list1:
+                        for i in range(len(list1)):
+                            if i % 2 == 0:
+                                original = Image.open(list1[i][6])
+                                col1.header("Image "+str(i))
+                                col1.image(original, use_column_width=True)
+                                col1.markdown(f'''
+                                    1. Artwork ID: {list1[i][0]}
+                                    2. Title: {list1[i][1]}
+                                    3. Artist Name: {list1[i][2]}
+                                    4. Description: {list1[i][3]}
+                                    5. Published Year: {list1[i][4]}
+                                    6. Type: {list1[i][5]}
+                                    ''')
+                            else:
+                                original1 = Image.open(list1[i][6])
+                                col2.header("Image "+str(i))
+                                col2.image(original1, use_column_width=True)
+                                col2.markdown(f'''
+                                    1. Artwork ID: {list1[i][0]}
+                                    2. Title: {list1[i][1]}
+                                    3. Artist Name: {list1[i][2]}
+                                    4. Description: {list1[i][3]}
+                                    5. Published Year: {list1[i][4]}
+                                    6. Type: {list1[i][5]}
+                                    ''')
+                        return
+                    else:
+                        st.warning("No Artwork of this Type published in this year")
                 except:
                     st.warning(
                         "No Artwork of this Type published in this year")
@@ -462,7 +470,7 @@ if st.session_state.isAdmin:
             name=st.text_input("Enter Guide Name: ")
             phno=st.text_input("Enter Phone Number: ")
             if st.button("Add"):
-                if len(phno)==10:
+                if len(phno)==10 and name:
                     try:
                         cur.execute("INSERT INTO guide(Name,Phone_number) VALUES (%s,%s)",(name,phno))
                         conn.commit()
@@ -471,7 +479,7 @@ if st.session_state.isAdmin:
                         st.error(f"An error occurred: {e}")
 
                 else:
-                    st.error("Invalid Phone Number")
+                    st.error("Fill the fields with proper details")
             conn.close()
 
     
@@ -539,9 +547,17 @@ if st.session_state.isAdmin:
     def do_guide_book():
         search_criteria = st.radio("Select Search Criteria:", [
                                    "Guide ID", "Tour Date"])
+        conn = mysql.connector.connect(
+                host='localhost', username='root', password='wasd', database='agms2')
+        cur = conn.cursor()
+        cur.execute("SELECT guide_ID FROM guide")
+        guide_ids = [str(row[0]) for row in cur.fetchall()]
+        guide_ids.insert(0,0)
+        conn.close()
 
         if search_criteria == 'Guide ID':
-            s1 = st.number_input("Guide_ID: ", step=1, value=1)
+            if guide_ids:
+                s1 = st.selectbox("Select Guide ID to search (Select 0 to view all Guides details): ", guide_ids)
             s2 = None
 
         elif search_criteria == 'Tour Date':
@@ -552,11 +568,10 @@ if st.session_state.isAdmin:
         x = st.button("Search")
 
         if x:
-            if s1:
-                conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms2')
-                cur = conn.cursor()
-
+            conn = mysql.connector.connect(
+                host='localhost', username='root', password='wasd', database='agms2')
+            cur = conn.cursor()
+            if s1!=0:
                 query = '''SELECT guide_id,tour_id, tour_date FROM guided_tour WHERE guide_id=%s'''
                 cur.execute(query, (s1,))
                 list1 = cur.fetchall()
@@ -566,10 +581,6 @@ if st.session_state.isAdmin:
                 st.write(df1)
 
             elif s2:
-                conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms2')
-                cur = conn.cursor()
-
                 cur_date=datetime.date.today()
                 if s2 <= str(cur_date):
                     query = '''SELECT guide_id,tour_id, tour_date FROM guided_tour WHERE tour_date=%s'''
@@ -581,42 +592,56 @@ if st.session_state.isAdmin:
                     st.write(df1)
                 else:
                     st.error("You have entered beyond current date...")
+            else:
+                query = '''SELECT guide_id,tour_id, tour_date FROM guided_tour '''
+                cur.execute(query)
+                list1 = cur.fetchall()
+                df1 = pd.DataFrame(
+                    list1, columns=['Guide ID', 'Tour ID', 'Tour Date'])
+                st.header("Guide Booking Transaction")
+                st.write(df1)
+
 
             conn.close()
 
     def set_ranking():
         file = st.file_uploader("Monthly count of People", type="csv")
-        monthly_df=None
         if file is not None:
             filename = file.name
             st.success(f"Uploaded file: {filename}")
             monthly_df = pd.read_csv(file)
-        try:
-            mean_values = monthly_df.mean()
 
-            # Rank the paintings based on their mean values
-            painting_ranks = mean_values.rank(ascending=False)
-            st.write("\nRanking of paintings based on mean values:")
-            st.write(painting_ranks)
+            if monthly_df is not None and not monthly_df.empty:
+                try:
+                    mean_values = monthly_df.mean()
 
+                    # Rank the paintings based on their mean values
+                    painting_ranks = mean_values.rank(ascending=False)
+                    st.write("\nRanking of paintings based on mean values:")
+                    st.write(painting_ranks)
 
-            #Update table 
-            conn = mysql.connector.connect(
-                host='localhost', 
-                username='root', 
-                password='wasd', 
-                database='agms2')
-            cur = conn.cursor()
-            for column in painting_ranks.index:
-                artwork_id = re.search(r'\d+$', column).group()  # Extract last digits
-                query = f"UPDATE artwork SET ranking = {int(painting_ranks[column])} WHERE artwork_ID = {artwork_id}"
-                cur.execute(query)
-            conn.commit()
-            conn.close()
+                    st.warning("Are you sure you want to update?")
+                    if st.button("!!UPDATE!!"):
+                        # Update table
+                        conn = mysql.connector.connect(
+                            host='localhost',
+                            username='root',
+                            password='wasd',
+                            database='agms2')
+                        cur = conn.cursor()
+                        for column in painting_ranks.index:
+                            artwork_id = re.search(r'\d+$', column).group()  # Extract last digits
+                            query = f"UPDATE artwork SET ranking = {int(painting_ranks[column])} WHERE artwork_ID = {artwork_id}"
+                            cur.execute(query)
+                        conn.commit()
+                        conn.close()
+                        st.success("Ranking Updated Successfully")
 
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
 
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+            else:
+                st.warning("Failed to upload. Check the format of the file.")
 
     def view_ranking():
         try:
@@ -645,12 +670,12 @@ if st.session_state.isAdmin:
                 host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
-            query = '''SELECT artwork_id,username,rating,comment FROM review WHERE rating=%s AND review_date> (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) ORDER BY review_date DESC'''
+            query = '''SELECT artwork_id,username,rating,comment,review_date FROM review WHERE rating=%s AND review_date> (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) ORDER BY review_date DESC'''
             cur.execute(query, (option,))
             list1 = cur.fetchall()
 
             df1 = pd.DataFrame(
-                list1, columns=['Artwork ID', 'Username', 'Ratings', 'Review'])
+                list1, columns=['Artwork ID', 'Username', 'Ratings', 'Review','Review Date'])
             st.header("Latest Reviews")
 
             st.write(df1)
@@ -662,7 +687,7 @@ if st.session_state.isAdmin:
                 host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
-            query = '''SELECT artwork_id, username, rating, comment 
+            query = '''SELECT artwork_id, username, rating, comment ,review_date
                     FROM review 
                     WHERE rating = %s AND review_date < (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) 
                     ORDER BY review_date DESC'''
@@ -670,7 +695,7 @@ if st.session_state.isAdmin:
             cur.execute(query, (option,))
             list1 = cur.fetchall()
             df1 = pd.DataFrame(
-                list1, columns=['Artwork ID', 'Username', 'Ratings', 'Review'])
+                list1, columns=['Artwork ID', 'Username', 'Ratings', 'Review','Review Date'])
             st.header("Past Reviews")
 
             st.write(df1)
@@ -681,9 +706,6 @@ if st.session_state.isAdmin:
         if st.button("Yes", key="logout_yes_button"):
             st.markdown("###Logout successfully")
             switch_page('login')
-
-        elif st.button("No", key="logout_no_button"):
-            st.markdown("### Continue")
 
     styles = {
         "container": {"margin": "0px !important", "padding": "0!important", "align-items": "stretch", "background-color": "#03dffc"},

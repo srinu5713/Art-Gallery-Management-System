@@ -10,7 +10,7 @@ import os
 import datetime
 
 def do_view_tasks():
-    st.markdown('###Stats')
+    st.markdown('Overview')
 
     selected_date = st.date_input("Select a date:", max_value=None)
     cur_date = datetime.date.today()
