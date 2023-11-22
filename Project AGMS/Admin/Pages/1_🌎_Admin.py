@@ -10,10 +10,6 @@ import os
 import datetime
  
 
-# conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='onlinebookstore')
-# cur = conn.cursor()
-
-
 st.set_page_config(page_title='Admin Dashboard', layout='wide')
 
 if 'isAdmin' not in st.session_state:
@@ -21,28 +17,7 @@ if 'isAdmin' not in st.session_state:
 
 if st.session_state.isAdmin:
 
-    UPLOAD_FOLDER = 'F:/PES/B_Tech (Sem_5)/Software Engineering/Mini Project/Main'
-    # dict1={1:"483px-Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg",2:"the starry night.jpg",3:"thinker.jpg",4:"Saurashtra.jpg",5:"Indian Heritage.jpg"}
-    # print(dict1)
-
-    # # URL of your custom background image
-    # background_image_url = "F:/PES/B_Tech (Sem_5)/Software Engineering/Mini Project/art_gallery_img.webp"
-
-    # # Add background image and styling to the entire app
-    # st.markdown(
-    #     f"""
-    #     <style>
-    #         .reportview-container {{
-    #             background: url("{background_image_url}") no-repeat center center fixed;
-    #             background-size: cover;
-    #         }}
-    #     </style>
-    #     """,
-    #     unsafe_allow_html=True,
-    # )
-
-    # def do_upload_tasks():
-    #     st.markdown('### Upload task file')
+    UPLOAD_FOLDER = 'C:/Users/HP/Documents/GitHub/agms/Project AGMS/Artworks'
 
 
     def do_view_tasks():
@@ -155,11 +130,11 @@ if st.session_state.isAdmin:
             cur.execute(query1)
             list1 = cur.fetchone()
             if s1 <= list1[0]:
-                query = "SELECT vtr.trans_id,vt.tag_id,vt.ticket_id,vt.entry_time,vt.exit_time FROM visitor_transaction vtr JOIN visitor_tag vt ON vtr.ticket_id=vt.ticket_id WHERE vt.assigned_date=%s"
+                query = "SELECT vt.tag_id,vt.ticket_id,vt.entry_time,vt.exit_time,t.booking_user_id FROM visitor_tag vt JOIN ticket t ON vt.ticket_id=t.ticket_id WHERE vt.assigned_date=%s"
                 cur.execute(query, (s1,))
                 list1 = cur.fetchall()
                 df1 = pd.DataFrame(
-                    list1, columns=['Log ID', 'Tag ID', 'Ticket ID', 'Entry time', 'Exit time'])
+                    list1, columns=['Tag ID', 'Ticket ID', 'Entry time', 'Exit time','Booking User ID'])
                 st.header("Log Transactions")
                 st.write(df1)
 
@@ -206,7 +181,7 @@ if st.session_state.isAdmin:
                         original = Image.open(list1[i][6])
                         col1.header("Image "+str(i))
                         col1.image(original, use_column_width=True)
-                        col1.markdown(f'''`
+                        col1.markdown(f'''
                                 1. Artwork ID: {list1[i][0]}
                                 2. Title: {list1[i][1]}
                                 3. Artist Name: {list1[i][2]}
@@ -342,12 +317,6 @@ if st.session_state.isAdmin:
                     st.warning(
                         "No Artwork of this Type published in this year")
 
-        # col1, mid, col2 = st.beta_columns([1,1,20])
-        # with col1:
-        #     st.image(original, width=60)
-        # with col2:
-        #     st.write('A Name')
-
     def allowed_file(filename):
         # Check if the file extension is allowed
         allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
@@ -404,79 +373,84 @@ if st.session_state.isAdmin:
         elif option == 'Delete Artwork':
             try:
                 conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms2')
+                    host='localhost', username='root', password='wasd', database='agms2')
                 cur = conn.cursor()
-                cur.execute("SELECT MAX(artwork_id) FROM artwork")
-                x=cur.fetchone()
+                cur.execute("SELECT Artwork_ID FROM artwork")
+                artwork_ids = [str(row[0]) for row in cur.fetchall()]
                 conn.close()
-                y=x[0]+1
-                aid = range(21, y, 1)
-                
-                s1 = st.selectbox("Select Artwork ID to delete: ",aid, index=21)
-                if st.button("Delete"):
-                    if s1:
-                        conn = mysql.connector.connect(
-                            host='localhost', username='root', password='wasd', database='agms2')
-                        cur = conn.cursor()
 
-                        query = "DELETE FROM Artwork WHERE Artwork_ID=%s"
-                        cur.execute(query, (s1,))
-                        st.write("Deleted Artwork successfully")
-                    else:
-                        st.error("Please enter artwork id to delete...")
+                if artwork_ids:
+                    s1 = st.selectbox("Select Artwork ID to delete: ", artwork_ids)
+                    if st.button("Delete"):
+                        if s1:
+                            conn = mysql.connector.connect(
+                                host='localhost', username='root', password='wasd', database='agms2')
+                            cur = conn.cursor()
+
+                            query = "DELETE FROM Artwork WHERE Artwork_ID=%s"
+                            cur.execute(query, (s1,))
+                            conn.commit()
+                            st.write("Deleted Artwork successfully")
+                        else:
+                            st.error("Please select artwork id to delete...")
+
+                else:
+                    st.warning("No artwork IDs available for deletion.")
 
             except mysql.connector.Error as e:
-                st.error("Please Enter valid value")
+                st.error("Error: Please Enter a valid value")
+
 
     def do_view_guide():
         conn = mysql.connector.connect(
                 host='localhost', username='root', password='wasd', database='agms2')
         cur = conn.cursor()
-        cur.execute("SELECT MAX(guide_id) FROM guide")
-        x=cur.fetchone()
+        cur.execute("SELECT guide_ID FROM guide")
+        guide_ids = [str(row[0]) for row in cur.fetchall()]
+        guide_ids.insert(0,0)
         conn.close()
-        y=x[0]+1
-        gid = range(0, y, 1)
-        s1 = st.selectbox("Select Guide ID to search (Select 0 to view all Guides details): ",gid, index=0)
-        s2 = st.text_input("Enter Guide Name: ")
 
-        if st.button("Search"):
-            conn = mysql.connector.connect(
-                host='localhost', username='root', password='wasd', database='agms2')
-            cur = conn.cursor()
+        if guide_ids:
+            s1 = st.selectbox("Select Guide ID to search (Select 0 to view all Guides details): ", guide_ids)
+            s2 = st.text_input("Enter Guide Name: ")
 
-            query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
-                    WHERE guide_id=%s AND Name LIKE %s 
-                    ORDER BY rating DESC'''
+            if st.button("Search"):
+                conn = mysql.connector.connect(
+                    host='localhost', username='root', password='wasd', database='agms2')
+                cur = conn.cursor()
 
-            if s1 and s2:
-                cur.execute(query, (s1, f"%{s2}%"))
-
-            elif s1:
                 query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
-                        WHERE guide_id=%s
+                        WHERE guide_id=%s AND Name LIKE %s 
                         ORDER BY rating DESC'''
-                cur.execute(query, (s1,))
 
-            elif s2:
-                query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
-                        WHERE Name LIKE %s
-                        ORDER BY rating DESC'''
-                cur.execute(query, (f"%{s2}%",))
+                if s1 and s2:
+                    cur.execute(query, (s1, f"%{s2}%"))
 
-            else:
-                query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
-                        ORDER BY rating DESC'''
-                cur.execute(query)
+                elif s1:
+                    query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
+                            WHERE guide_id=%s
+                            ORDER BY rating DESC'''
+                    cur.execute(query, (s1,))
 
-            list1 = cur.fetchall()
-            df1 = pd.DataFrame(
-                list1, columns=['Guide ID', 'Name', 'Phone Number', 'Rating'])
-            st.header("View Guides")
-            with option_context('display.max_colwidth', 400):
-                st.write(df1)
+                elif s2:
+                    query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
+                            WHERE Name LIKE %s
+                            ORDER BY rating DESC'''
+                    cur.execute(query, (f"%{s2}%",))
 
-            conn.close()
+                else:
+                    query = '''SELECT Guide_ID, Name, Phone_number, Rating FROM guide 
+                            ORDER BY rating DESC'''
+                    cur.execute(query)
+
+                list1 = cur.fetchall()
+                df1 = pd.DataFrame(
+                    list1, columns=['Guide ID', 'Name', 'Phone Number', 'Rating'])
+                st.header("View Guides")
+                with option_context('display.max_colwidth', 400):
+                    st.write(df1)
+
+                conn.close()
 
     def do_add_del_guide():
         option = st.selectbox('Select the operation:',
@@ -491,7 +465,7 @@ if st.session_state.isAdmin:
                     try:
                         cur.execute("INSERT INTO guide(Name,Phone_number) VALUES (%s,%s)",(name,phno))
                         conn.commit()
-
+                        st.write("Added Guide Successfully!")
                     except Exception as e:
                         st.error(f"An error occurred: {e}")
 
@@ -503,12 +477,11 @@ if st.session_state.isAdmin:
         else:
             conn = mysql.connector.connect(host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
-            cur.execute("SELECT MAX(guide_id) FROM guide")
-            x=cur.fetchone()
+            cur.execute("SELECT guide_ID FROM guide")
+            guide_ids = [str(row[0]) for row in cur.fetchall()]
+            guide_ids.insert(0,0)
             conn.close()
-            y=x[0]+1
-            gid = range(1, y, 1)
-            s1 = st.selectbox("Enter Guide ID: ",gid, index=1)
+            s1 = st.selectbox("Enter Guide ID: ",guide_ids, index=len(guide_ids)-1)
 
             if st.button("Delete"):
                 if s1:
@@ -518,88 +491,49 @@ if st.session_state.isAdmin:
 
                     query = '''DELETE FROM guide WHERE Guide_ID = %s'''
                     cur.execute(query, (s1,))
-                    conn.close()
                     list1 = cur.fetchall()
-                    df1 = pd.DataFrame(
-                        list1, columns=['Guide ID', 'Name', 'Phone Number', 'Rating'])
-                    st.header("View Guides")
-                    st.write(df1)
+                    conn.commit()
+                    st.write("Deleted Guide Successfully!")
 
                 else:
                     st.error("Please enter the guide ID...")
 
+                conn.close()
 
     def do_ticket_book():
-        s1 = st.date_input("From Booking Date: ")
-        s1 = s1.strftime('%Y-%m-%d')
-        s2 = st.date_input("To Booking date: ")
-        s2 = s2.strftime('%Y-%m-%d')
+        st.write("Click on Search Button to view booking transaction history")
 
-        x = st.button("Search")
+        if st.button("Search"):
+        
+            conn = mysql.connector.connect(
+                host='localhost', username='root', password='wasd', database='agms2')
+            cur = conn.cursor()
 
-        if x:
-            if s1 and s2 and s2 >= s1:
-                conn = mysql.connector.connect(
-                    host='localhost', username='root', password='wasd', database='agms2')
-                cur = conn.cursor()
+            # query = '''
+            # SELECT v.trans_ID, v.booking_user_id, v.no_of_tickets, t.date_of_visit, v.time, 100 * v.no_of_tickets AS amount 
+            # FROM visitor_transactions v 
+            # JOIN ticket t ON v.ticket_id = t.ticket_ID
+            # WHERE DATE(v.time) BETWEEN %s AND %s
+            # '''
 
-                query = '''
-                SELECT v.trans_ID, v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100 * v.no_of_tickets AS amount 
-                FROM visitor_transactions v 
-                JOIN ticket t ON v.ticket_id = t.ticket_ID
-                WHERE DATE(v.time) BETWEEN %s AND %s
-                '''
-                query1 = 'SELECT CURRENT_DATE()'
-                cur.execute(query1)
-                list1 = cur.fetchone()
-                if s2 <= list1[0]:
-                    cur.execute(query, (s1, s2))
-                    list1 = cur.fetchall()
-                    df1 = pd.DataFrame(list1, columns=[
-                                       'Transaction ID', 'Visitor ID', 'No of tickets', 'Date of visit', 'Booked Date', 'Amount'])
-                    st.header("Ticket Booking Transaction")
-                    st.write(df1)
-                else:
-                    st.error("No Transactions yet")
-                conn.close()
-            else:
-                st.error("Enter valid From to dates")
+            query = '''
+            SELECT v.trans_ID, v.booking_user_id, v.no_of_tickets, v.time, 100 * v.no_of_tickets AS amount 
+            FROM visitor_transactions v ORDER BY v.time DESC
+            '''
 
-            # elif s1:
-            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms2')
-            #     cur = conn.cursor()
+            try:
+                cur.execute(query)
+                list1 = cur.fetchall()
+                df1 = pd.DataFrame(list1, columns=[
+                                    'Transaction ID', 'Booking User ID', 'No of tickets', 'Booked Date', 'Amount'])
+                st.header("Ticket Booking Transaction")
+                st.write(df1)
 
-            #     query='''SELECT v.trans_ID,v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100*(v.no_of_tickets) AS amount
-            #     FROM visitor_transactions v JOIN ticket t ON v.booking_visitor_id = t.Visitor_ID WHERE date(v.time)>%s'''
-            #     cur.execute(query,(s1,))
-            #     list1=cur.fetchall()
-            #     df1=pd.DataFrame(list1,columns=['Transaction ID','Visitor ID','No of tickets','Date of visit','Booked Date','Amount'])
-            #     st.header("Ticket Booking Transaction")
-            #     st.write(df1)
+            except:
+                st.error("No Transactions yet")
+            conn.close()
 
-            # elif s2:
-            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms2')
-            #     cur = conn.cursor()
 
-            #     query='''SELECT v.trans_ID,v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100*(v.no_of_tickets) AS amount
-            #     FROM visitor_transactions v JOIN ticket t ON v.booking_visitor_id = t.Visitor_ID WHERE date(v.time)<%s'''
-            #     cur.execute(query,(s2,))
-            #     list1=cur.fetchall()
-            #     df1=pd.DataFrame(list1,columns=['Transaction ID','Visitor ID','No of tickets','Date of visit','Booked Date','Amount'])
-            #     st.header("Ticket Booking Transaction")
-            #     st.write(df1)
-
-            # else:
-            #     conn = mysql.connector.connect(host='localhost',username='root',password='wasd',database='agms2')
-            #     cur = conn.cursor()
-
-            #     query='''SELECT v.trans_ID,v.booking_visitor_id, v.no_of_tickets, t.date_of_visit, v.time, 100*(v.no_of_tickets) AS amount
-            #     FROM visitor_transactions v JOIN ticket t ON v.booking_visitor_id = t.Visitor_ID'''
-            #     cur.execute(query)
-            #     list1=cur.fetchall()
-            #     df1=pd.DataFrame(list1,columns=['Transaction ID','Visitor ID','No of tickets','Date of visit','Booked Date','Amount'])
-            #     st.header("Ticket Booking Transaction")
-            #     st.write(df1)
 
     def do_guide_book():
         search_criteria = st.radio("Select Search Criteria:", [
@@ -635,10 +569,8 @@ if st.session_state.isAdmin:
                     host='localhost', username='root', password='wasd', database='agms2')
                 cur = conn.cursor()
 
-                query1 = 'SELECT CURRENT_DATE()'
-                cur.execute(query1)
-                list1 = cur.fetchone()
-                if s2 <= list1[0]:
+                cur_date=datetime.date.today()
+                if s2 <= str(cur_date):
                     query = '''SELECT guide_id,tour_id, tour_date FROM guided_tour WHERE tour_date=%s'''
                     cur.execute(query, (s2,))
                     list1 = cur.fetchall()
@@ -651,6 +583,36 @@ if st.session_state.isAdmin:
 
             conn.close()
 
+    def set_ranking():
+        file = st.file_uploader("Monthly count of People", type="csv")
+        monthly_df=None
+        if file is not None:
+            filename = file.name
+            st.success(f"Uploaded file: {filename}")
+            monthly_df = pd.read_csv(file)
+        try:
+            mean_values = monthly_df.mean()
+
+            # Display the results
+            st.write("Mean values:")
+            st.write(mean_values)
+
+            # Rank the paintings based on their mean values
+            painting_ranks = mean_values.rank(ascending=False)
+            st.write("\nRanking of paintings based on mean values:")
+            st.write(painting_ranks)
+            painting_ranks = mean_values.rank()
+            st.write("\nRanking of paintings based on mean values:")
+            st.write(painting_ranks)
+        except :
+            st.error("No fle uploaded")
+
+    def view_ranking():
+        pass
+
+
+
+
     def do_latest_rev():
         option = st.selectbox("Ratings", ('5', '4', '3', '2', '1'))
         if st.button("Search"):
@@ -658,12 +620,12 @@ if st.session_state.isAdmin:
                 host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
-            query = '''SELECT artwork_id,visitor_id,rating,comment FROM review WHERE rating=%s AND review_date> (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) ORDER BY review_date DESC'''
+            query = '''SELECT artwork_id,username,rating,comment FROM review WHERE rating=%s AND review_date> (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) ORDER BY review_date DESC'''
             cur.execute(query, (option,))
             list1 = cur.fetchall()
 
             df1 = pd.DataFrame(
-                list1, columns=['Artwork ID', 'Visitor ID', 'Ratings', 'Review'])
+                list1, columns=['Artwork ID', 'Username', 'Ratings', 'Review'])
             st.header("Latest Reviews")
 
             st.write(df1)
@@ -675,7 +637,7 @@ if st.session_state.isAdmin:
                 host='localhost', username='root', password='wasd', database='agms2')
             cur = conn.cursor()
 
-            query = '''SELECT artwork_id, visitor_id, rating, comment 
+            query = '''SELECT artwork_id, username, rating, comment 
                     FROM review 
                     WHERE rating = %s AND review_date < (SELECT DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)) 
                     ORDER BY review_date DESC'''
@@ -683,7 +645,7 @@ if st.session_state.isAdmin:
             cur.execute(query, (option,))
             list1 = cur.fetchall()
             df1 = pd.DataFrame(
-                list1, columns=['Artwork ID', 'Visitor ID', 'Ratings', 'Review'])
+                list1, columns=['Artwork ID', 'Username', 'Ratings', 'Review'])
             st.header("Past Reviews")
 
             st.write(df1)
@@ -713,8 +675,6 @@ if st.session_state.isAdmin:
                     'title': None,
                     'items': {
                         'View Tasks': {'action': do_view_tasks, 'item_icon': 'list-task', 'submenu': None},
-                        # 'Manage Tasks': {'action': do_manage_tasks, 'item_icon': 'list-check', 'submenu': None},
-                        # 'Upload Tasks': {'action': do_upload_tasks, 'item_icon': 'cloud-upload-fill', 'submenu': None},
                     },
                     'menu_icon': None,
                     'default_index': 0,
@@ -771,6 +731,20 @@ if st.session_state.isAdmin:
                     'items': {
                         'Precursor for Log Management': {'action': do_credentials, 'item_icon': 'key', 'submenu': None},
                         'View Logs': {'action': do_logs, 'item_icon': 'journals', 'submenu': None},
+                    },
+                    'menu_icon': None,
+                    'default_index': 0,
+                    'with_view_panel': 'main',
+                    'orientation': 'horizontal',
+                    'styles': styles
+                }
+            },
+            'Update Ranking': {
+                'action': None, 'item_icon': 'gear', 'submenu': {
+                    'title': None,
+                    'items': {
+                        'Upload CSV file': {'action': set_ranking, 'item_icon': 'key', 'submenu': None},
+                        'View Ranking': {'action': view_ranking, 'item_icon': 'journals', 'submenu': None},
                     },
                     'menu_icon': None,
                     'default_index': 0,
